@@ -1,0 +1,35 @@
+ :host {
+      display: block;
+    }
+
+    /* Custom input styling */
+    ::ng-deep .p-inputtext {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+
+    /* Button states */
+    ::ng-deep .p-button-secondary {
+      background-color: #6b7280;
+      border-color: #6b7280;
+    }
+
+    ::ng-deep .p-button-secondary:enabled:hover {
+      background-color: #4b5563;
+      border-color: #4b5563;
+    }
+
+    /* Error state styling */
+    .border-red-500 {
+      border-color: #ef4444 !important;
+    }
+
+    .border-red-500:focus {
+      ring-color: #ef4444 !important;
+      border-color: #ef4444 !important;
+    }
+
+    /* Loading state */
+    ::ng-deep .p-button-loading {
+      opacity: 0.8;
+    }

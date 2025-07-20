@@ -1,0 +1,193 @@
+<div class="table-wrapper">
+  <!-- Table Header Actions -->
+  <div class="table-header" *ngIf="showHeader">
+    <div class="table-actions">
+      <!-- Export Excel Button -->
+      <button
+        *ngIf="showExport"
+        pButton
+        label="تحميل Excel"
+        icon="pi pi-download"
+        class="p-button-rounded p-button-warning excel-btn"
+        (click)="exportExcel()"
+      ></button>
+      
+      <!-- Share Button -->
+      <button
+        *ngIf="showShare"
+        pButton
+        icon="pi pi-share-alt"
+        class="p-button-rounded p-button-outlined share-btn"
+        (click)="share()"
+      ></button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-container" *ngIf="showSearch">
+      <div class="search-input-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          pInputText
+          type="text"
+          placeholder="ابحث..."
+          class="search-input"
+          [(ngModel)]="searchValue"
+          (input)="onSearch()"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Data Table -->
+  <div class="table-container">
+    <table class="enhanced-table">
+      <!-- Table Header -->
+      <thead>
+        <tr>
+          <th *ngIf="showActions" class="actions-column">#</th>
+          <th *ngFor="let col of columns" [style.width]="col.width" class="table-header-cell">
+            {{ col.header }}
+          </th>
+        </tr>
+      </thead>
+
+      <!-- Table Body -->
+      <tbody>
+        <tr *ngFor="let rowData of displayedData; let i = index" 
+            class="table-row"
+            [class.loading-row]="loading">
+          
+          <!-- Actions Column -->
+          <td *ngIf="showActions" class="actions-cell">
+            <button 
+              class="actions-menu-btn"
+              (click)="toggleRowMenu(i, $event)"
+              [class.active]="activeMenuRow === i"
+            >
+              <i class="pi pi-ellipsis-v"></i>
+            </button>
+            
+            <!-- Actions Menu -->
+            <div class="actions-menu" 
+                 *ngIf="activeMenuRow === i" 
+                 [style.top.px]="menuPosition.top"
+                 [style.left.px]="menuPosition.left">
+              <button
+                *ngFor="let action of actions"
+                class="action-item"
+                (click)="executeAction(action, rowData)"
+                [style.display]="action.visible ? (action.visible(rowData) ? 'flex' : 'none') : 'flex'"
+              >
+                <i [class]="action.icon"></i>
+                <span>{{ action.label }}</span>
+              </button>
+            </div>
+          </td>
+
+          <!-- Data Columns -->
+          <td *ngFor="let col of columns" class="table-cell">
+            <!-- Loading State -->
+            <div *ngIf="loading" class="loading-skeleton"></div>
+            
+            <!-- Normal Content -->
+            <ng-container *ngIf="!loading">
+              <!-- Text/Number Display -->
+              <span *ngIf="col.type === 'text' || col.type === 'number' || !col.type"
+                    class="cell-content">
+                {{ getFieldValue(rowData, col.field) }}
+              </span>
+
+              <!-- Date Display -->
+              <span *ngIf="col.type === 'date'" class="cell-content date-cell">
+                {{ getFieldValue(rowData, col.field) | date:'dd/MM/yyyy' }}
+              </span>
+
+              <!-- Badge Display -->
+              <span *ngIf="col.type === 'badge'" 
+                    class="status-badge"
+                    [ngClass]="getBadgeClass(getFieldValue(rowData, col.field))">
+                {{ getFieldValue(rowData, col.field) }}
+              </span>
+
+              <!-- Link Display -->
+              <a *ngIf="col.type === 'link'" 
+                 [href]="getFieldValue(rowData, col.field)"
+                 class="table-link"
+                 target="_blank">
+                {{ col.linkText || getFieldValue(rowData, col.field) }}
+              </a>
+
+              <!-- Score Display -->
+              <span *ngIf="col.type === 'score'" 
+                    class="score-cell"
+                    [ngClass]="getScoreClass(getFieldValue(rowData, col.field))">
+                {{ getFieldValue(rowData, col.field) }}
+              </span>
+            </ng-container>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="!loading && displayedData.length === 0" class="empty-row">
+          <td [attr.colspan]="getTotalColumns()" class="empty-cell">
+            <div class="empty-state">
+              <i class="pi pi-info-circle empty-icon"></i>
+              <p class="empty-text">{{ emptyMessage || 'لا توجد بيانات للعرض' }}</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container" *ngIf="showPaginator && !loading">
+    <div class="pagination-info">
+      <span class="pagination-text">عرض</span>
+      <select 
+        class="page-size-select"
+        [(ngModel)]="pageSize"
+        (change)="onPageSizeChange()"
+      >
+        <option *ngFor="let option of pageSizeOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+      <span class="pagination-text">من العناصر</span>
+    </div>
+    
+    <div class="pagination-controls">
+      <button class="pagination-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">
+        «
+      </button>
+      <button class="pagination-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+        ‹
+      </button>
+      
+      <ng-container *ngFor="let page of getVisiblePages()">
+        <button 
+          *ngIf="page !== '...'"
+          class="pagination-btn"
+          [class.active]="page === currentPage"
+          (click)="goToPage(+page)"
+        >
+          {{ page }}
+        </button>
+        <span *ngIf="page === '...'" class="pagination-ellipsis">...</span>
+      </ng-container>
+      
+      <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        ›
+      </button>
+      <button class="pagination-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">
+        »
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay for closing menus -->
+<div class="menu-overlay" 
+     *ngIf="activeMenuRow !== null" 
+     (click)="closeMenu()">
+</div>

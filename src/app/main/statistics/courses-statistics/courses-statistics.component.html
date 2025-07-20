@@ -1,0 +1,142 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-4 py-6">
+    
+    <!-- Breadcrumb with page title -->
+    <app-breadcrumb 
+      [items]="breadcrumbItems" 
+      [pageTitle]="'الإحصائيات'">
+    </app-breadcrumb>
+
+    <!-- Main Courses Statistics Card -->
+    <div class="mx-auto bg-white rounded-lg shadow-sm p-8">
+      <div class="border-b border-gray-200 mb-8">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">إحصائيات كورساتك</h1>
+      </div>
+      
+      <!-- Statistics Grid -->
+      <div class="flex justify-around gap-12">
+        
+        <!-- Videos Watched Statistics -->
+        <div class="stat-item">
+          <div class="stat-header">
+            <h3 class="stat-title">عدد الفيديوهات اللي شوفتها</h3>
+            <div class="stat-badges">
+              <span class="stat-badge stat-badge-pink">49 فيديو</span>
+              <span class="stat-badge-total">من 129</span>
+            </div>
+          </div>
+          <div class="stat-chart">
+            <div class="circular-progress" data-percentage="47">
+              <svg class="progress-ring" width="200" height="200">
+                <circle
+                  class="progress-ring-circle-bg"
+                  stroke="#f3f4f6"
+                  stroke-width="12"
+                  fill="transparent"
+                  r="88"
+                  cx="100"
+                  cy="100"
+                />
+                <circle
+                  class="progress-ring-circle progress-ring-pink"
+                  stroke="#ec4899"
+                  stroke-width="12"
+                  fill="transparent"
+                  r="88"
+                  cx="100"
+                  cy="100"
+                  [style.stroke-dasharray]="getCircumference()"
+                  [style.stroke-dashoffset]="getStrokeDashoffset(47)"
+                />
+              </svg>
+              <div class="progress-text">
+                <span class="progress-percentage">47%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tests Completed Statistics -->
+        <div class="stat-item">
+          <div class="stat-header">
+            <h3 class="stat-title">عدد الاختبارات اللي خلصتها</h3>
+            <div class="stat-badges">
+              <span class="stat-badge stat-badge-cyan">15 فيديو</span>
+              <span class="stat-badge-total">من 129</span>
+            </div>
+          </div>
+          <div class="stat-chart">
+            <div class="circular-progress" data-percentage="12">
+              <svg class="progress-ring" width="200" height="200">
+                <circle
+                  class="progress-ring-circle-bg"
+                  stroke="#f3f4f6"
+                  stroke-width="12"
+                  fill="transparent"
+                  r="88"
+                  cx="100"
+                  cy="100"
+                />
+                <circle
+                  class="progress-ring-circle progress-ring-cyan"
+                  stroke="#06b6d4"
+                  stroke-width="12"
+                  fill="transparent"
+                  r="88"
+                  cx="100"
+                  cy="100"
+                  [style.stroke-dasharray]="getCircumference()"
+                  [style.stroke-dashoffset]="getStrokeDashoffset(12)"
+                />
+              </svg>
+              <div class="progress-text">
+                <span class="progress-percentage">12%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test Achievement Statistics -->
+        <div class="stat-item">
+          <div class="stat-header">
+            <h3 class="stat-title">أعلي اختبار تم تحقيقه</h3>
+            <div class="stat-badges">
+              <span class="stat-badge stat-badge-purple">95 درجة</span>
+              <span class="stat-badge-total">من 100</span>
+            </div>
+          </div>
+          <div class="stat-chart">
+            <div class="circular-progress" data-percentage="95">
+              <svg class="progress-ring" width="200" height="200">
+                <circle
+                  class="progress-ring-circle-bg"
+                  stroke="#f3f4f6"
+                  stroke-width="12"
+                  fill="transparent"
+                  r="88"
+                  cx="100"
+                  cy="100"
+                />
+                <circle
+                  class="progress-ring-circle progress-ring-purple"
+                  stroke="#8b5cf6"
+                  stroke-width="12"
+                  fill="transparent"
+                  r="88"
+                  cx="100"
+                  cy="100"
+                  [style.stroke-dasharray]="getCircumference()"
+                  [style.stroke-dashoffset]="getStrokeDashoffset(95)"
+                />
+              </svg>
+              <div class="progress-text">
+                <span class="progress-percentage">95%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

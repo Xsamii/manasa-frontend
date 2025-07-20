@@ -1,1 +1,86 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'primeng/resources/themes/lara-light-blue/theme.css';
+@import 'primeng/resources/primeng.css';
+@import 'primeicons/primeicons.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// RTL Support
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+// Custom scrollbar styles
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+// PrimeNG RTL overrides
+.p-component {
+  direction: inherit;
+}
+
+.p-datatable {
+  direction: rtl;
+  
+  .p-datatable-thead > tr > th {
+    text-align: right;
+  }
+  
+  .p-datatable-tbody > tr > td {
+    text-align: right;
+  }
+}
+
+.p-dropdown {
+  text-align: right;
+  
+  .p-dropdown-label {
+    text-align: right;
+  }
+}
+
+.p-inputtext {
+  text-align: right;
+}
+
+// Custom form field styles
+.form-field {
+  @apply space-y-2;
+}
+
+// Loading overlay
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+// Responsive utilities
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

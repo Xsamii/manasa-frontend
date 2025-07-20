@@ -1,0 +1,220 @@
+.form-field {
+  @apply space-y-2;
+}
+
+// Custom styling for Arabic text alignment
+:host ::ng-deep {
+  .p-inputtext {
+    text-align: right;
+    direction: rtl;
+  }
+
+  .p-dropdown {
+    text-align: right;
+    direction: rtl;
+  }
+
+  .p-dropdown-label {
+    text-align: right;
+  }
+
+  .p-password input {
+    text-align: right;
+    direction: rtl;
+  }
+
+  .p-fileupload-choose {
+    background-color: #f3f4f6;
+    border: 1px dashed #d1d5db;
+    color: #6b7280;
+    width: 100%;
+    text-align: center;
+  }
+
+  .p-fileupload-choose:hover {
+    background-color: #e5e7eb;
+  }
+
+  .p-button {
+    font-family: inherit;
+  }
+
+  // RTL support for form elements
+  .p-dropdown-panel {
+    direction: rtl;
+  }
+
+  .p-dropdown-items {
+    text-align: right;
+  }
+
+  .p-dropdown-item {
+    text-align: right;
+  }
+
+  // Custom scrollbar for form area - positioned on the left side for RTL
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #ff6636 #f9fafb;
+    
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f9fafb;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #d1d5db;
+      border-radius: 2px;
+      height: 40px; // Shorter thumb
+      
+      &:hover {
+        background-color: #9ca3af;
+      }
+    }
+
+    // Remove arrows/buttons from scrollbar
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
+  }
+
+  // For RTL layout, position scrollbar on the left
+  .custom-scrollbar {
+    direction: ltr; // This forces scrollbar to appear on left in RTL context
+    
+    > * {
+      direction: rtl; // But keep content RTL
+    }
+  }
+}
+
+// Fixed height for the container
+.min-h-screen {
+  height: 100vh;
+  max-height: 100vh;
+}
+
+// Enhanced responsive adjustments
+@media (max-width: 1024px) {
+  .right-section {
+    @apply w-2/5;
+  }
+  
+  .left-section {
+    @apply w-3/5;
+  }
+}
+
+@media (max-width: 768px) {
+  .right-section {
+    @apply w-full;
+  }
+  
+  .left-section {
+    @apply hidden;
+  }
+  
+  // Mobile-specific adjustments
+  .form-field {
+    @apply space-y-1;
+  }
+  
+  // Smaller padding on mobile
+  :host ::ng-deep {
+    .p-inputtext,
+    .p-password input {
+      padding: 0.5rem !important;
+      font-size: 0.875rem !important;
+    }
+    
+    .p-dropdown {
+      font-size: 0.875rem !important;
+    }
+    
+    .p-dropdown .p-dropdown-label {
+      padding: 0.5rem !important;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  // Extra small devices
+  .min-h-screen {
+    min-height: 100vh;
+    height: auto;
+  }
+  
+  :host ::ng-deep {
+    .p-inputtext,
+    .p-password input {
+      padding: 0.75rem !important;
+      font-size: 1rem !important;
+    }
+    
+    .p-dropdown .p-dropdown-label {
+      padding: 0.75rem !important;
+    }
+  }
+}
+
+// Form spacing adjustments for better scrolling
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+// Better focus states for mobile
+@media (max-width: 768px) {
+  :host ::ng-deep {
+    .p-inputtext:focus,
+    .p-password input:focus {
+      outline: 2px solid #f97316;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// Improved dropdown styling for mobile
+@media (max-width: 768px) {
+  :host ::ng-deep {
+    .p-dropdown-panel {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  }
+}
+
+// Better button styling for mobile
+@media (max-width: 768px) {
+  :host ::ng-deep {
+    .p-button {
+      padding: 0.75rem 1rem !important;
+      font-size: 1rem !important;
+      min-height: 48px; // Better touch target
+    }
+  }
+}
+// Unified phone input styling
+:host ::ng-deep {
+  .p-dropdown.border-0 .p-dropdown-trigger,
+  .p-dropdown.border-0 .p-dropdown-label {
+    border: none;
+    background: transparent;
+  }
+  
+  .p-inputtext.border-0 {
+    border: none;
+    box-shadow: none;
+  }
+  
+  .p-inputtext.border-0:focus {
+    border: none;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,89 @@
+:host {
+  display: block;
+  direction: rtl;
+}
+
+/* Wallet Input Styling */
+.wallet-input {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px 48px 16px 16px;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+/* Wallet Charge Button */
+.wallet-charge-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  border: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* Wallet Code Button */
+.wallet-code-btn {
+  border: 2px solid #f97316;
+  color: #f97316;
+  background: white;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #fff7ed;
+    transform: translateY(-1px);
+  }
+}
+
+/* PrimeNG Overrides */
+::ng-deep {
+  .p-button {
+    font-family: inherit;
+  }
+  
+  .p-button-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    border: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+    }
+  }
+  
+  .p-inputtext {
+    font-family: inherit;
+    
+    &:focus {
+      border-color: #f97316;
+      box-shadow: 0 0 0 0.2rem rgba(249, 115, 22, 0.2);
+    }
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .wallet-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}

@@ -1,0 +1,223 @@
+// :host {
+//       display: block;
+//     }
+
+//     /* Custom search input focus styles */
+//     input:focus {
+//       outline: none;
+//     }
+
+//     /* Theme toggle custom styling */
+//     ::ng-deep .p-inputswitch {
+//       width: 3rem;
+//       height: 1.75rem;
+//     }
+
+//     ::ng-deep .p-inputswitch .p-inputswitch-slider {
+//       background-color: #e5e7eb;
+//       border-radius: 0.875rem;
+//     }
+
+//     ::ng-deep .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+//       background-color: #f97316;
+//     }
+
+//     /* Profile menu styling */
+//     ::ng-deep .profile-menu {
+//       margin-top: 0.5rem;
+//       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+//       border: 1px solid #e5e7eb;
+//       border-radius: 0.75rem;
+//     }
+
+//     ::ng-deep .profile-menu .p-overlaypanel-content {
+//       padding: 0;
+//       border-radius: 0.75rem;
+//     }
+
+//     /* Responsive adjustments */
+//     @media (max-width: 768px) {
+//       .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+//         --tw-space-x-reverse: 0;
+//         margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+//         margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+//       }
+//     }
+:host {
+  display: block;
+}
+
+/* Custom search input focus styles */
+input:focus {
+  outline: none;
+}
+
+/* Theme toggle custom styling */
+::ng-deep .p-inputswitch {
+  width: 3rem;
+  height: 1.75rem;
+}
+
+::ng-deep .p-inputswitch .p-inputswitch-slider {
+  background-color: #e5e7eb;
+  border-radius: 0.875rem;
+}
+
+::ng-deep .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+  background-color: #f97316;
+}
+
+/* Enhanced Profile Menu Styling */
+::ng-deep .enhanced-profile-menu {
+  margin-top: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  overflow: hidden;
+  min-width: 280px;
+}
+
+::ng-deep .enhanced-profile-menu .p-overlaypanel-content {
+  padding: 0;
+  border-radius: 1rem;
+}
+
+.profile-dropdown-content {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* User Header */
+.user-header {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  color: white;
+  padding: 1rem 1.25rem;
+  text-align: center;
+}
+
+/* Menu Content */
+.menu-content {
+  background: white;
+}
+
+/* Menu Items */
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  color: #374151;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  width: 100%;
+  text-align: right;
+  
+  &:hover {
+    background-color: #f9fafb;
+    color: #f97316;
+    
+    .menu-icon {
+      color: #f97316;
+    }
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.menu-icon {
+  color: #9ca3af;
+  margin-left: 0.75rem;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+/* Submenu Toggle */
+.submenu-toggle {
+  position: relative;
+  
+  &.active .submenu-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+.submenu-arrow {
+  transition: transform 0.2s ease;
+  margin-left: 0.5rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Submenu */
+.submenu {
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  
+  &.open {
+    max-height: 500px;
+  }
+}
+
+.submenu-item {
+  display: block;
+  padding: 0.625rem 1.5rem 0.625rem 3rem;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: right;
+  
+  &:hover {
+    background-color: #ffffff;
+    color: #f97316;
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Logout Item */
+.logout-item {
+  color: #dc2626 !important;
+  border-top: 2px solid #f3f4f6;
+  margin-top: 0.5rem;
+  
+  &:hover {
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+    
+    .menu-icon {
+      color: #dc2626 !important;
+    }
+  }
+  
+  .menu-icon {
+    color: #dc2626 !important;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+  
+  ::ng-deep .enhanced-profile-menu {
+    min-width: 260px;
+  }
+}

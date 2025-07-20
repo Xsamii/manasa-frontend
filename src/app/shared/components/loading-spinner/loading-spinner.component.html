@@ -1,0 +1,10 @@
+  <div class="loading-container" [class.overlay]="overlay">
+      <div class="loading-content">
+        <p-progressSpinner 
+          [style]="{ width: size, height: size }" 
+          strokeWidth="4"
+          animationDuration="1s"
+        ></p-progressSpinner>
+        <p *ngIf="message" class="loading-message">{{ message }}</p>
+      </div>
+    </div>

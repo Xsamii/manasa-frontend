@@ -1,0 +1,82 @@
+  <div class="  bg-gray-50">
+      <div class="container mx-auto px-4 pt-8 pb-28 space-y-4">
+        
+        <!-- Breadcrumb -->
+        <app-breadcrumb
+         [items]="breadcrumbItems"
+        [pageTitle]="'شحن كود جديد'">
+        ></app-breadcrumb>
+ 
+        <!-- Main Content -->
+        <div class="  mx-auto bg-white rounded-lg shadow-sm p-8">
+          
+             <div class="  border-b border-gray-200">
+                      <h1 class="text-2xl font-bold text-gray-800 mb-4">كارت اكواد الشحن</h1>
+
+        </div>
+ 
+          <!-- Page Title -->
+          <div class="text-center my-8">
+            
+            <div class="text-center mb-8">
+              <p class="text-gray-600 text-lg leading-relaxed">
+                اكتب الكود المكون من 11 رقم علي الكارت الخاص بكود
+                <br>
+                الشحن بتاعك هنا عشان تشحنة علي محفظتك
+              </p>
+            </div>
+          </div>
+
+          <!-- Code Input Form -->
+          <form [formGroup]="rechargeForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            
+            <!-- Code Input with QR Scanner -->
+            <div class="space-y-4">
+              <div class="relative max-w-md  flex items-center mx-auto">
+                 <!-- QR Code Scanner Icon -->
+                <button 
+                  type="button"
+                  class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  (click)="openQRScanner()"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h2M4 4h4m0 0v4m0 0h2m8-4h2m0 0v4m0 0h-2M4 16h4m0 0v4m0 0h2"/>
+                  </svg>
+                </button>
+                <input 
+                  pInputText 
+                  formControlName="rechargeCode"
+                  placeholder="أدخل كود الشحن الخاص بك"
+                  class="w-full text-center bg-gray-200 text-lg py-4 px-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  [class.border-red-500]="isCodeInvalid"
+                  maxlength="14"
+                  (input)="onCodeInput($event)"
+                />
+                
+               
+              </div>
+
+              <!-- Error Message -->
+              <div *ngIf="errorMessage" class="flex items-center justify-center text-red-500 text-sm">
+                <i class="pi pi-exclamation-circle ml-2"></i>
+                <span>{{ errorMessage }}</span>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+              <button 
+                pButton 
+                type="submit"
+                label="شحن الكارت"
+                class="w-full max-w-md py-4 text-lg font-medium"
+                [class]="isCodeInvalid || !rechargeForm.get('rechargeCode')?.value ? 'p-button-secondary' : 'p-button-warning'"
+                [disabled]="isCodeInvalid || !rechargeForm.get('rechargeCode')?.value || isLoading"
+                [loading]="isLoading"
+              ></button>
+            </div>
+          </form>
+ 
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,25 @@
+:host {
+      display: block;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 1024px) {
+      .grid-cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .flex {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      .text-4xl {
+        font-size: 2rem;
+      }
+      
+      .text-3xl {
+        font-size: 1.75rem;
+      }
+    }

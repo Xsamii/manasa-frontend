@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  direction: rtl;
+}
+
+/* Custom styling specific to watching details if needed */
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+}

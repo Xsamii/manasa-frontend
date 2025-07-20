@@ -1,0 +1,42 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center" dir="rtl">
+      <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+        
+        <!-- Success Icon -->
+        <div class="mb-6">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+            <i class="pi pi-check text-2xl text-green-600"></i>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">مرحباً بك!</h2>
+        <p class="text-gray-600 mb-6">
+          تم تسجيل دخولك بنجاح. يمكنك الآن الوصول إلى جميع الكورسات والمحتوى التعليمي.
+        </p>
+
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+          <button 
+            pButton 
+            label="الذهاب إلى لوحة التحكم"
+            class="w-full p-button-warning"
+            (click)="goToDashboard()"
+          ></button>
+          
+          <button 
+            pButton 
+            label="تصفح الكورسات"
+            class="w-full p-button-outlined"
+            (click)="goToCourses()"
+          ></button>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <p class="text-sm text-gray-500">
+            إذا كنت تواجه أي مشاكل، يمكنك 
+            <a href="#" class="text-orange-600 hover:text-orange-500">التواصل مع الدعم الفني</a>
+          </p>
+        </div>
+      </div>
+    </div>

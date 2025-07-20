@@ -1,0 +1,52 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center" dir="rtl">
+      <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+        
+        <!-- Success Icon -->
+        <div class="mb-6">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+            <i class="pi pi-clock text-2xl text-blue-600"></i>
+          </div>
+        </div>
+
+        <!-- Status Message -->
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">تم إرسال طلبك بنجاح!</h2>
+        <p class="text-gray-600 mb-6">
+          شكراً لك على التسجيل. سيتم مراجعة طلبك والتواصل معك خلال ساعات قليلة لتفعيل الحساب.
+        </p>
+
+        <!-- Next Steps -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+          <h3 class="font-medium text-gray-800 mb-2">الخطوات التالية:</h3>
+          <ul class="text-sm text-gray-600 space-y-1 text-right">
+            <li>• سيتم مراجعة بياناتك</li>
+            <li>• ستصلك رسالة تأكيد عبر البريد الإلكتروني</li>
+            <li>• يمكنك بعدها تسجيل الدخول والاستمتاع بالكورسات</li>
+          </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+          <button 
+            pButton 
+            label="تسجيل دخول"
+            class="w-full p-button-warning"
+            routerLink="/auth/login"
+          ></button>
+          
+          <button 
+            pButton 
+            label="الرجوع للرئيسية"
+            class="w-full p-button-outlined"
+            routerLink="/"
+          ></button>
+        </div>
+
+        <!-- Support Contact -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <p class="text-sm text-gray-500">
+            لديك استفسار؟ 
+            <a href="#" class="text-orange-600 hover:text-orange-500">تواصل معنا</a>
+          </p>
+        </div>
+      </div>
+    </div>

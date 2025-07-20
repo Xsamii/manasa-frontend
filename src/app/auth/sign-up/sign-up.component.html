@@ -1,0 +1,366 @@
+<div class="min-h-screen bg-gray-50 flex" dir="rtl">
+  <!-- Right Section - Form (1/3 of screen) -->
+  <div class="right-section w-full lg:w-1/3 bg-white flex flex-col">
+    <!-- Logo Section -->
+    <div class="p-4 lg:p-6 text-center border-b border-gray-200">
+      <div class="flex items-center justify-center mb-4">
+        <img src="assets/icons/logo.svg" alt="Logo" class="w-full h-16 lg:h-24 ml-2 rounded-full">
+      </div>
+    </div>
+
+    <!-- Scrollable Form Section -->
+    <div class="flex-1 overflow-y-auto p-4 lg:p-6 custom-scrollbar">
+      <div class="mb-4 lg:mb-6">
+        <h2 class="text-lg lg:text-xl font-semibold text-gray-800 mb-2">طلب إنشاء حساب جديد</h2>
+        <p class="text-xs lg:text-sm text-gray-600">
+          أدخل بياناتك بشكل صحيح و سيتم التواصل معك خلال
+          <br>
+          ساعات قليلة لتفعيل الحساب.
+        </p>
+      </div>
+
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="space-y-3 lg:space-y-4">
+        
+        <!-- Full Name -->
+        <div class="form-field">
+          <label for="fullName" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            الاسم رباعي
+          </label>
+          <input 
+            pInputText 
+            id="fullName"
+            formControlName="fullName"
+            placeholder="أدخل اسمك رباعي"
+            class="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+            [class.ng-invalid]="isFieldInvalid('fullName')"
+          />
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('fullName')">
+            {{ getFieldError('fullName') }}
+          </small>
+        </div>
+
+        <!-- Phone Number with Country Code -->
+        <div class="form-field">
+          <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            رقم الهاتف
+          </label>
+          <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+           <input 
+              pInputText 
+              id="phoneNumber"
+              formControlName="phoneNumber"
+              placeholder="أدخل رقم الهاتف الخاص بك"
+              class="flex-1 text-right border-0 p-2 text-sm lg:text-base focus:ring-0"
+              [class.ng-invalid]="isFieldInvalid('phoneNumber')"
+            />
+            <p-dropdown 
+              [options]="countryCodes" 
+              formControlName="countryCode"
+              placeholder="كود"
+              styleClass="border-0 rounded-none bg-transparent"
+              class="w-24 lg:w-28 shrink-0   border-gray-300"
+              [class.ng-invalid]="isFieldInvalid('countryCode')"
+            ></p-dropdown>
+          </div>
+          <small class="text-blue-600 text-right block text-xs mt-1">
+            {{ getPhoneNumberHint(registrationForm.get('countryCode')?.value) }}
+          </small>
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('phoneNumber')">
+            {{ getFieldError('phoneNumber') }}
+          </small>
+        </div>
+
+        <!-- Father's Phone with Country Code -->
+        <div class="form-field">
+          <label for="fatherPhoneNumber" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            رقم هاتف الأب
+          </label>
+          <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
+            <input 
+              pInputText 
+              id="fatherPhoneNumber"
+              formControlName="fatherPhoneNumber"
+              placeholder="أدخل رقم هاتف الأب"
+              class="flex-1 text-right border-0 p-2 text-sm lg:text-base focus:ring-0"
+              [class.ng-invalid]="isFieldInvalid('fatherPhoneNumber')"
+            />
+            <p-dropdown 
+              [options]="countryCodes" 
+              formControlName="fatherCountryCode"
+              placeholder="كود"
+              styleClass="border-0 rounded-none bg-transparent"
+              class="w-24 lg:w-28 shrink-0  border-gray-300"
+              [class.ng-invalid]="isFieldInvalid('fatherCountryCode')"
+            ></p-dropdown>
+           
+          </div>
+          <small class="text-blue-600 text-right block text-xs mt-1">
+            {{ getPhoneNumberHint(registrationForm.get('fatherCountryCode')?.value) }}
+          </small>
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('fatherPhoneNumber')">
+            {{ getFieldError('fatherPhoneNumber') }}
+          </small>
+        </div>
+
+        <!-- Mother's Phone with Country Code -->
+        <div class="form-field">
+          <label for="motherPhoneNumber" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            رقم هاتف الأم
+          </label>
+          <div class="flex items-center border border-gray-300 rounded-md overflow-hidden"> 
+            <input 
+              pInputText 
+              id="motherPhoneNumber"
+              formControlName="motherPhoneNumber"
+              placeholder="أدخل رقم هاتف الأم"
+              class="flex-1 text-right border-0 p-2 text-sm lg:text-base focus:ring-0"
+              [class.ng-invalid]="isFieldInvalid('motherPhoneNumber')"
+            />
+             <p-dropdown 
+              [options]="countryCodes" 
+              formControlName="motherCountryCode"
+              placeholder="كود"
+              styleClass="border-0 rounded-none bg-transparent"
+              class="w-24 lg:w-28 shrink-0 border-gray-300"
+              [class.ng-invalid]="isFieldInvalid('motherCountryCode')"
+            ></p-dropdown>
+          </div>
+          <small class="text-blue-600 text-right block text-xs mt-1">
+            {{ getPhoneNumberHint(registrationForm.get('motherCountryCode')?.value) }}
+          </small>
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('motherPhoneNumber')">
+            {{ getFieldError('motherPhoneNumber') }}
+          </small>
+        </div>
+
+        <!-- School Name -->
+        <div class="form-field">
+          <label for="schoolName" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            اسم المدرسة
+          </label>
+          <input 
+            pInputText 
+            id="schoolName"
+            formControlName="schoolName"
+            placeholder="أدخل اسم المدرسة"
+            class="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+            [class.ng-invalid]="isFieldInvalid('schoolName')"
+          />
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('schoolName')">
+            {{ getFieldError('schoolName') }}
+          </small>
+        </div>
+
+        <!-- Job Title -->
+        <div class="form-field">
+          <label for="jobTitle" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            مهنة ولي الأمر
+          </label>
+          <input 
+            pInputText 
+            id="jobTitle"
+            formControlName="jobTitle"
+            placeholder="أدخل اسم مهنة ولي الأمر"
+            class="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+            [class.ng-invalid]="isFieldInvalid('jobTitle')"
+          />
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('jobTitle')">
+            {{ getFieldError('jobTitle') }}
+          </small>
+        </div>
+
+        <!-- Governorate -->
+        <div class="form-field">
+          <label for="governorate" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            المحافظة
+          </label>
+          <p-dropdown 
+            [options]="governorates" 
+            formControlName="governorate"
+            placeholder="اختر اسم محافظتك"
+            styleClass="w-full border border-gray-300 rounded-md"
+            [class.ng-invalid]="isFieldInvalid('governorate')"
+          ></p-dropdown>
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('governorate')">
+            {{ getFieldError('governorate') }}
+          </small>
+        </div>
+
+        <!-- Study Year -->
+        <div class="form-field">
+          <label for="studyYear" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            السنة الدراسية
+          </label>
+          <p-dropdown 
+            [options]="studyYears" 
+            formControlName="studyYear"
+            placeholder="اختر سنتك الدراسية"
+            styleClass="w-full border border-gray-300 rounded-md"
+            [class.ng-invalid]="isFieldInvalid('studyYear')"
+          ></p-dropdown>
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('studyYear')">
+            {{ getFieldError('studyYear') }}
+          </small>
+        </div>
+
+        <!-- Gender -->
+        <div class="form-field">
+          <label for="gender" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            الجنس
+          </label>
+          <p-dropdown 
+            [options]="genders" 
+            formControlName="gender"
+            placeholder="اختر الجنس"
+            styleClass="w-full border border-gray-300 rounded-md"
+            [class.ng-invalid]="isFieldInvalid('gender')"
+          ></p-dropdown>
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('gender')">
+            {{ getFieldError('gender') }}
+          </small>
+        </div>
+
+        <!-- Sector -->
+        <div class="form-field">
+          <label for="sector" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            الشعبة
+          </label>
+          <p-dropdown 
+            [options]="sectors" 
+            formControlName="sector"
+            placeholder="اختر الشعبة"
+            styleClass="w-full border border-gray-300 rounded-md"
+            [class.ng-invalid]="isFieldInvalid('sector')"
+          ></p-dropdown>
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('sector')">
+            {{ getFieldError('sector') }}
+          </small>
+        </div>
+
+        <!-- Nationality -->
+        <div class="form-field">
+          <label for="nationality" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            الجنسية
+          </label>
+          <p-dropdown 
+            [options]="nationalities" 
+            formControlName="nationality"
+            placeholder="اختر الجنسية"
+            styleClass="w-full border border-gray-300 rounded-md"
+            [class.ng-invalid]="isFieldInvalid('nationality')"
+          ></p-dropdown>
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('nationality')">
+            {{ getFieldError('nationality') }}
+          </small>
+        </div>
+
+        <!-- Email -->
+        <div class="form-field">
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            البريد الإلكتروني
+          </label>
+          <input 
+            pInputText 
+            id="email"
+            formControlName="email"
+            placeholder="أدخل بريدك الإلكتروني"
+            class="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+            [class.ng-invalid]="isFieldInvalid('email')"
+          />
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('email')">
+            {{ getFieldError('email') }}
+          </small>
+        </div>
+
+        <!-- Password Fields Side by Side -->
+        <div class="form-field">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Password -->
+            <div>
+              <label for="password" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+                كلمة المرور
+              </label>
+              <p-password 
+                formControlName="password"
+                placeholder="أدخل كلمة مرور قوية"
+                styleClass="w-full"
+                inputStyleClass="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+                [class.ng-invalid]="isFieldInvalid('password')"
+                [feedback]="false"
+              ></p-password>
+              <small class="text-gray-500 text-right block text-xs mt-1">
+                8 أحرف على الأقل
+              </small>
+              <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('password')">
+                {{ getFieldError('password') }}
+              </small>
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+              <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+                تأكيد كلمة المرور
+              </label>
+              <p-password 
+                formControlName="confirmPassword"
+                placeholder="تأكيد كلمة المرور الخاصة بك"
+                styleClass="w-full"
+                inputStyleClass="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+                [class.ng-invalid]="isFieldInvalid('confirmPassword')"
+                [feedback]="false"
+              ></p-password>
+              <!-- Show password match status -->
+              <div class="mt-1" *ngIf="registrationForm.get('confirmPassword')?.value && registrationForm.get('password')?.value">
+                <small class="text-green-600 text-right block text-xs" *ngIf="registrationForm.get('password')?.value === registrationForm.get('confirmPassword')?.value">
+                  ✓ كلمات المرور متطابقة
+                </small>
+                <small class="text-red-500 text-right block text-xs" *ngIf="registrationForm.get('password')?.value !== registrationForm.get('confirmPassword')?.value">
+                  ✗ كلمات المرور غير متطابقة
+                </small>
+              </div>
+              <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('confirmPassword')">
+                {{ getFieldError('confirmPassword') }}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="form-field">
+          <label class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            ارفع صورة البطاقة / شهادة ميلادك
+          </label>
+          <p-fileUpload 
+            mode="basic" 
+            chooseLabel="اختر الملف"
+            accept="image/*"
+            maxFileSize="5000000"
+            (onSelect)="onFileSelect($event, 'idImage')"
+            styleClass="w-full"
+          ></p-fileUpload>
+          <small class="text-gray-500 text-right block mt-1 text-xs">
+            حجم الصورة يجب أن يكون أقل من 5 ميجابايت ونسبة الصورة 1:1
+          </small>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-4">
+          <button 
+            pButton 
+            type="submit"
+            label="طلب إنشاء حساب"
+            class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 lg:py-3 px-4 rounded-lg font-medium transition-colors text-sm lg:text-base"
+            [disabled]="registrationForm.invalid"
+          ></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Left Section - Image (2/3 of screen) -->
+  <div class="left-section hidden lg:block lg:w-2/3 relative overflow-hidden">
+    <div class="absolute inset-0 flex items-center justify-center">
+      <img src="assets/images/signup1.png" alt="" class="w-full h-full object-cover">
+    </div>
+  </div>
+</div>

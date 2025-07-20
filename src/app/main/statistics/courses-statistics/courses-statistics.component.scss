@@ -1,0 +1,161 @@
+:host {
+  display: block;
+  direction: rtl;
+}
+
+/* Statistics Grid */
+.grid {
+  display: grid;
+  gap: 3rem;
+  
+  &.grid-cols-1 {
+    grid-template-columns: 1fr;
+  }
+  
+  @media (min-width: 1024px) {
+    &.lg\\:grid-cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+/* Stat Item */
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Stat Header */
+.stat-header {
+  margin-bottom: 2rem;
+  
+  .stat-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+  }
+  
+  .stat-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+}
+
+/* Stat Badges */
+.stat-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+  
+  &.stat-badge-pink {
+    background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+  }
+  
+  &.stat-badge-cyan {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  }
+  
+  &.stat-badge-purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  }
+}
+
+.stat-badge-total {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  background-color: #f3f4f6;
+}
+
+/* Circular Progress */
+.stat-chart {
+  position: relative;
+}
+
+.circular-progress {
+  position: relative;
+  display: inline-block;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke-linecap: round;
+}
+
+.progress-ring-circle-bg {
+  stroke: #f3f4f6;
+}
+
+.progress-ring-pink {
+  stroke: #ec4899;
+}
+
+.progress-ring-cyan {
+  stroke: #06b6d4;
+}
+
+.progress-ring-purple {
+  stroke: #8b5cf6;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  .progress-percentage {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #374151;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .grid.lg\\:grid-cols-3 {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .stat-header .stat-title {
+    font-size: 1.1rem;
+  }
+  
+  .progress-ring {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .progress-ring-circle,
+  .progress-ring-circle-bg {
+    r: 70;
+    cx: 80;
+    cy: 80;
+  }
+  
+  .progress-text .progress-percentage {
+    font-size: 2rem;
+  }
+}

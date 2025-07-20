@@ -1,0 +1,283 @@
+<header class="bg-white border-b shadow-[0px_5px_20px_0px_#0D3A4A1A] border-gray-200 px-4 py-3">
+      <div class="flex items-center justify-between max-w-7xl mx-auto">
+        
+    
+
+        <!-- Right Side  - Logo -->
+        <div class="flex items-center">
+            <a href="/">
+          <img src="assets/icons/logo.svg" alt="منيسرة" class="h-12 md:h-16 w-auto"> 
+          </a>
+        </div>
+
+        <!-- Center - Wallet, Profile, Notifications -->
+        <div class="flex items-center space-x-3 space-x-reverse">
+          
+          <!-- Wallet Balance -->
+          <button 
+            class="flex items-center bg-white border border-gray-200 px-2 md:px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            routerLink="/wallet"
+          >
+            <i class="pi pi-wallet text-orange-600 ml-1 md:ml-2 text-sm"></i>
+            <span class="text-xs md:text-sm font-medium text-gray-700">{{ walletBalance }} جنية</span>
+          </button>
+
+          <!-- Notifications -->
+          <div class="relative">
+            <button
+              class="p-2 text-gray-600 hover:text-gray-800 relative"
+              (click)="showNotifications()"
+            >
+              <i class="pi pi-bell text-lg"></i>
+              <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                {{ notificationCount }}
+              </span>
+            </button>
+          </div>
+
+          <!-- Profile Menu -->
+          <div class="relative">
+            <button
+              class="p-2 text-gray-600 hover:text-gray-800"
+              (click)="profileMenu.toggle($event)"
+            >
+              <i class="pi pi-user text-lg"></i>
+            </button>
+            
+            <!-- Profile Dropdown Menu -->
+          <p-overlayPanel #profileMenu styleClass="enhanced-profile-menu" [dismissable]="true">
+    <div class="profile-dropdown-content">
+      <!-- User Header -->
+      <div class="user-header">
+        <div class="flex items-center justify-center mb-3">
+          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <i class="pi pi-user text-xl text-white"></i>
+          </div>
+        </div>
+        <p class="font-medium text-white text-center">أهلاً عمر محمد نجم محمد</p>
+      </div>
+      
+      <!-- Menu Items -->
+      <div class="menu-content">
+        <!-- Dashboard -->
+        <a 
+          routerLink="/dashboard" 
+          class="menu-item"
+          (click)="profileMenu.hide()"
+        >
+          <span class="text-right">الرئيسية</span>
+          <i class="pi pi-home menu-icon"></i>
+        </a>
+        
+        <!-- Student Forum -->
+        <a 
+          routerLink="/forum" 
+          class="menu-item"
+          (click)="profileMenu.hide()"
+        >
+          <span class="text-right">منتدى الطلبة</span>
+          <i class="pi pi-users menu-icon"></i>
+        </a>
+        
+        <!-- Recharge Code -->
+        <a 
+          routerLink="/code-recharge" 
+          class="menu-item"
+          (click)="profileMenu.hide()"
+        >
+          <span class="text-right">شحن كود</span>
+          <i class="pi pi-qrcode menu-icon"></i>
+        </a>
+        
+        <!-- My Account with Submenu -->
+        <div class="menu-item submenu-toggle" 
+             [class.active]="showAccountSubmenu"
+             (click)="toggleAccountSubmenu()">
+          <span class="text-right">حسابي</span>
+          <div class="flex items-center">
+            <i class="pi pi-angle-left submenu-arrow" 
+               [class.rotate-90]="showAccountSubmenu"></i>
+            <i class="pi pi-user menu-icon"></i>
+          </div>
+        </div>
+        
+        <!-- Account Submenu -->
+        <div class="submenu" [class.open]="showAccountSubmenu">
+          <a 
+            routerLink="/code-recharge" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            شحن كود
+          </a>
+          
+          <a 
+            routerLink="/courses" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            محاضراتي
+          </a>
+          
+          <a 
+            routerLink="/watching-details" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            تفاصيل المشاهدات
+          </a>
+          
+          <a 
+            routerLink="/subscriptions" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            الاشتراكات
+          </a>
+          
+          <a 
+            routerLink="/purchase-history" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            الفواتير
+          </a>
+          
+          <a 
+            routerLink="/assessments/results/center" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            نتائج اختبار السنتر
+          </a>
+          
+          <a 
+            routerLink="/statistics/platform" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            إحصائياتك علي المنصة
+          </a>
+          
+          <a 
+            routerLink="/statistics/courses" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            إحصائيات كورساتك
+          </a>
+          
+          <a 
+            routerLink="/assessments/results/exams" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            نتائج الإمتحانات
+          </a>
+          
+          <a 
+            routerLink="/assessments/results/homework" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            نتائج الواجبات
+          </a>
+          
+          <a 
+            routerLink="/assessments/custom-quiz" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            امتحان خاص بيك
+          </a>
+          
+          <a 
+            routerLink="/security" 
+            class="submenu-item"
+            (click)="profileMenu.hide()"
+          >
+            الأمان و تسجيل الدخول
+          </a>
+        </div>
+        
+        <!-- My Courses -->
+        <a 
+          routerLink="/courses" 
+          class="menu-item"
+          (click)="profileMenu.hide()"
+        >
+          <span class="text-right">كورساتي</span>
+          <i class="pi pi-book menu-icon"></i>
+        </a>
+        
+        <!-- My Wallet -->
+        <a 
+          routerLink="/wallet" 
+          class="menu-item"
+          (click)="profileMenu.hide()"
+        >
+          <span class="text-right">محفظتي</span>
+          <i class="pi pi-wallet menu-icon"></i>
+        </a>
+        
+        <!-- Logout -->
+        <button 
+          class="menu-item logout-item w-full text-right"
+          (click)="logout()"
+        >
+          <span class="text-right">تسجيل خروج</span>
+          <i class="pi pi-sign-out menu-icon"></i>
+        </button>
+      </div>
+    </div>
+  </p-overlayPanel>
+          </div>
+        </div>
+
+
+
+    <!-- Left Side - Search & Theme Toggle -->
+        <div class="flex items-center space-x-4 space-x-reverse">
+          <!-- Theme Toggle -->
+          <div class="flex items-center">
+            <p-inputSwitch 
+              [(ngModel)]="isDarkMode" 
+              (onChange)="toggleTheme()"
+            ></p-inputSwitch>
+          </div>
+
+          <!-- Search -->
+          <div class="relative hidden md:block">
+            <input
+              type="text"
+              placeholder="بحث..."
+              class="w-72 lg:w-80 pr-4 pl-10 py-2 bg-gray-100 border border-gray-200 rounded-lg text-right text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition-colors"
+            />
+            <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          </div>
+
+          <!-- Mobile Search Button -->
+          <button 
+            class="md:hidden p-2 text-gray-600 hover:text-gray-800"
+            (click)="toggleMobileSearch()"
+          >
+            <i class="pi pi-search text-lg"></i>
+          </button>
+        </div>
+
+
+
+      </div>
+
+      <!-- Mobile Search Bar (hidden by default) -->
+      <div class="md:hidden mt-3 px-2" [class.hidden]="!showMobileSearch">
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="بحث..."
+            class="w-full pr-4 pl-10 py-2 bg-gray-100 border border-gray-200 rounded-lg text-right text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition-colors"
+          />
+          <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+    </header>

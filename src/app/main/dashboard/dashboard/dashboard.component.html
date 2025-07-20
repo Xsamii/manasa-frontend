@@ -1,0 +1,114 @@
+ <!-- Hero Section -->
+    <div class="bg-gray-200 relative overflow-hidden">
+      <!-- Background Image Layer with Curved Bottom -->
+      <div class="absolute inset-0 bg-teal-800">
+        <!-- You can add a background image here if needed -->
+        <!-- <img src="assets/images/hero-bg.jpg" class="w-full h-full object-cover" /> -->
+      </div>
+      
+      <!-- Curved Bottom SVG -->
+        <div class="absolute bottom-0 left-0 right-0">
+        <svg viewBox="0 0 1200 80" preserveAspectRatio="none" class="w-full h-20 fill-gray-200">
+          <path d="M0,0 Q600,110 1200,0 L1200,80 L0,80 Z"></path>
+        </svg>
+      </div>
+      
+      <div class="max-w-7xl mx-auto px-6 py-20 relative z-10">
+        <div class="flex items-center justify-between">
+          
+          <!-- Right Video Container -->
+          <div class="flex-1 flex justify-center">
+            <div class="relative">
+              <!-- Orange Border Container (bigger) -->
+              <div class="bg-white p-1 rounded-3xl">
+                <!-- Video/Image Area (no white container) -->
+                <div class="relative w-96 h-60 bg-gray-200 rounded-3xl overflow-hidden">
+                  <img 
+                    src="assets/images/hero-students.jpg" 
+                    alt="Students learning" 
+                    class="w-full h-full object-cover"
+                  />
+                  <!-- Play Button -->
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-20 h-20 bg-white border-[1px] border-white bg-opacity-20 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-105 transition-transform">
+                      <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M8 5v10l8-5-8-5z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Left Content (positioned at half height of video) -->
+          <div class="flex-1 text-white" style="margin-top: 120px;">
+            <h1 class="text-4xl font-bold mb-4">تصميم تجربة المستخدم</h1>
+            <h2 class="text-3xl font-bold text-orange-400 mb-6">عملي و تفاعلي</h2>
+            <p class="text-lg leading-relaxed max-w-md">
+            تفهّم منصة تعلم مهارات تصميم تجربة المستخدم بشكل عملي تفاعلي علي يد خبراء ومحترفون لاكثر من ٢٠ عام في المجال.
+
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Navigation Dots/Arrows -->
+        <div class="flex justify-center gap-4 mt-12 space-x-3">
+          <button class="w-10 h-10 bg-white border-[1px] border-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+          <button class="w-10 h-10 bg-white border-[1px] border-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Cards Section -->
+    <div class="bg-gray-50 pt-16 pb-44">
+      <div class=" mx-auto px-6">
+        <div class="grid grid-cols-4 gap-6 items-center">
+       
+          <!-- موادي (Materials) -->
+          <div class="bg-[#FFF0F0] w-full rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
+          routerLink="/materials">
+          <h3 class="font-semibold text-gray-800">موادي</h3>
+            <div class="w-12 h-12">
+              <img src="assets/icons/subjects.svg" alt="">
+            </div>
+          </div>
+          
+          <!-- كورساتي (Courses) -->
+          <div class="bg-[#FFF2E5] rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
+               routerLink="/courses">
+               <h3 class="font-semibold text-gray-800">كورساتي</h3>
+            <div class="w-12 h-12">
+                 <img src="assets/icons/courses.svg" alt="">
+            </div>
+          </div>
+           
+          <!-- إشتراكاتي (Subscriptions) -->
+          <div class="bg-[#E1F7E3] rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
+               routerLink="/subscriptions">
+               <h3 class="font-semibold text-gray-800">إشتراكاتي</h3>
+            <div class="w-12 h-12 ">
+              <img src="assets/icons/subscriptions.svg" alt="">
+            </div>
+          </div>
+            
+          <!-- مسابقة (Competition) -->
+          <div class="bg-[#EBEBFF] rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
+               routerLink="/competitions">
+               <h3 class="font-semibold text-gray-800">مسابقة</h3>
+            <div class="w-12 h-12 ">
+              <img src="assets/icons/competition.svg" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

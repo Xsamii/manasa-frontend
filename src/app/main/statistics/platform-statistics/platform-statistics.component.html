@@ -1,0 +1,74 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-4 py-6">
+    
+    <!-- Breadcrumb with page title -->
+    <app-breadcrumb 
+      [items]="breadcrumbItems" 
+      [pageTitle]="'الإحصائيات'">
+    </app-breadcrumb>
+
+    <!-- Main Statistics Card -->
+    <div class="mx-auto bg-white rounded-lg shadow-sm p-8">
+      <div class="border-b border-gray-200 mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">إحصائياتك علي المنصة</h1>
+      </div>
+      
+      <!-- Statistics Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-2 gap-8">
+        
+        <!-- Lecture Time Statistics -->
+        <div class="stats-card">
+          <div class="stats-content">
+            <div class="stats-icon lecture-time">
+              <i class="pi pi-clock"></i>
+            </div>
+            <div class="stats-info">
+              <h3 class="stats-title">إجمالي مدة فتح المحاضرات علي الموقع</h3>
+              <p class="stats-value lecture-value">ساعتان</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Views Statistics -->
+        <div class="stats-card">
+          <div class="stats-content">
+            <div class="stats-icon video-views">
+              <i class="pi pi-eye"></i>
+            </div>
+            <div class="stats-info">
+              <h3 class="stats-title">إجمالي عدد مرات مشاهدة الفيديوهات علي الموقع</h3>
+              <p class="stats-value video-value">34 مرة</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz Opening Statistics -->
+        <div class="stats-card">
+          <div class="stats-content">
+            <div class="stats-icon quiz-opening">
+              <i class="pi pi-list"></i>
+            </div>
+            <div class="stats-info">
+              <h3 class="stats-title">إجمالي عدد مرات فتح الاختبار</h3>
+              <p class="stats-value quiz-value">0 مرة</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test Completion Statistics -->
+        <div class="stats-card">
+          <div class="stats-content">
+            <div class="stats-icon test-completion">
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <div class="stats-info">
+              <h3 class="stats-title">إجمالي عدد مرات إنهاء الاختبارات</h3>
+              <p class="stats-value test-value">0 مرة</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

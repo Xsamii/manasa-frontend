@@ -1,0 +1,118 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-4 py-6">
+    
+    <!-- Breadcrumb with page title -->
+    <app-breadcrumb 
+      [items]="breadcrumbItems" 
+      [pageTitle]="'الفواتير'">
+    </app-breadcrumb>
+
+    <!-- Main Purchase History Card -->
+    <div class="mx-auto bg-white rounded-lg shadow-sm p-8">
+      <div class="border-b border-gray-200 mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">فواتيري و تاريخ الشراء</h1>
+      </div>
+      
+      <!-- Purchase History Timeline -->
+      <div class="purchase-timeline">
+        
+        <!-- Purchase Date Header -->
+        <div *ngFor="let dateGroup of groupedPurchases; let isFirst = first; let isLast = last" class="timeline-group">
+          
+          <!-- Date Header -->
+          <div class="date-header" [class.first-date]="isFirst">
+            <div class="date-content">
+              <h3 class="date-title">{{ dateGroup.date }}</h3>
+              <div class="date-badges">
+                <span class="date-badge total-badge">عدد فواتير: {{ dateGroup.purchases.length }}</span>
+                <span class="date-badge amount-badge">المجموع: {{ getTotalAmount(dateGroup.purchases) }} جم</span>
+                <span class="date-badge method-badge">شحن كود سحر</span>
+              </div>
+            </div>
+            <div class="timeline-connector" *ngIf="!isLast"></div>
+          </div>
+
+          <!-- Purchase Items -->
+          <div class="purchase-items">
+            <div *ngFor="let purchase of dateGroup.purchases" class="purchase-item">
+              
+              <!-- Purchase Card (Collapsible) -->
+              <div class="purchase-card" [class.expanded]="purchase.isExpanded" (click)="togglePurchase(purchase)">
+                
+                <!-- Collapsed View (Always Visible) -->
+                <div class="collapsed-view">
+                  <div class="collapsed-icon">
+                    <i class="pi" [class.pi-chevron-down]="!purchase.isExpanded" [class.pi-chevron-up]="purchase.isExpanded"></i>
+                  </div>
+                  <div class="collapsed-content">
+                    <div class="collapsed-meta">
+                      <span class="collapsed-time">{{ purchase.time }}</span>
+                      <div class="collapsed-badges">
+                        <span class="meta-badge time-badge">
+                          <i class="pi pi-clock"></i>
+                          عدد فواتير
+                        </span>
+                        <span class="meta-badge amount-badge">
+                          <i class="pi pi-credit-card"></i>
+                          {{ purchase.amount }} جم
+                        </span>
+                        <span class="meta-badge method-badge">
+                          <i class="pi pi-tag"></i>
+                          {{ purchase.paymentMethod }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Expanded View (Only when expanded) -->
+                <div class="expanded-view" *ngIf="purchase.isExpanded && purchase.hasImage">
+                  <div class="purchase-header">
+                    <div class="purchase-info">
+                      <h4 class="purchase-title">{{ purchase.title }}</h4>
+                      <p class="purchase-instructor">{{ purchase.instructor }}</p>
+                    </div>
+                    <div class="purchase-amount">{{ purchase.amount }} جم</div>
+                  </div>
+                  <div class="purchase-image" *ngIf="purchase.image">
+                    <img [src]="purchase.image" [alt]="purchase.title" />
+                  </div>
+                  <div class="purchase-actions">
+                    <button class="action-btn primary" (click)="viewPurchaseDetails(purchase); $event.stopPropagation()">
+                      <i class="pi pi-eye"></i>
+                      عرض التفاصيل
+                    </button>
+                    <button class="action-btn secondary" (click)="downloadInvoice(purchase); $event.stopPropagation()">
+                      <i class="pi pi-download"></i>
+                      تحميل الفاتورة
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- End Message -->
+        <div class="timeline-end">
+          <div class="end-message">
+            <i class="pi pi-check-circle"></i>
+            <p>Yay! You have seen all your purchase history.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="loading-spinner">
+          <i class="pi pi-spin pi-spinner"></i>
+        </div>
+        <p class="loading-text">جاري تحميل تاريخ المشتريات...</p>
+      </div>
+
+    </div>
+  </div>
+</div>
