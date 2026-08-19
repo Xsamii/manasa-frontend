@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { testProviders } from '../../../testing/test-providers';
 import { PlatformStatisticsComponent } from './platform-statistics.component';
 
 describe('PlatformStatisticsComponent', () => {
@@ -8,7 +8,8 @@ describe('PlatformStatisticsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlatformStatisticsComponent]
+      imports: [PlatformStatisticsComponent],
+      providers: testProviders,
     })
     .compileComponents();
 

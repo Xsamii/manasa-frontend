@@ -10,6 +10,27 @@ html[dir="rtl"] {
   direction: rtl;
 }
 
+html.dark {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+html.dark body,
+html.dark header,
+html.dark .bg-white,
+html.dark .bg-gray-50,
+html.dark .bg-gray-100 {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+html.dark a,
+html.dark h1,
+html.dark h2,
+html.dark h3 {
+  color: inherit;
+}
+
 // Custom scrollbar styles
 ::-webkit-scrollbar {
   width: 6px;

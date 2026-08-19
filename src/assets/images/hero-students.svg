@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Students learning">
+  <rect width="960" height="540" fill="#0f766e"/>
+  <circle cx="320" cy="280" r="70" fill="#fdba74"/>
+  <circle cx="480" cy="250" r="78" fill="#fed7aa"/>
+  <circle cx="640" cy="280" r="70" fill="#fdba74"/>
+  <rect x="250" y="350" width="460" height="120" rx="24" fill="#fff7ed"/>
+  <text x="480" y="420" text-anchor="middle" font-size="36" fill="#9a3412" font-family="Tahoma, Arial">EFJ31)</text>
+</svg>

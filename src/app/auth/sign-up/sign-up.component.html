@@ -19,6 +19,13 @@
         </p>
       </div>
 
+      <p-message
+        *ngIf="errorMessage"
+        severity="error"
+        [text]="errorMessage"
+        styleClass="mb-4"
+      ></p-message>
+
       <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="space-y-3 lg:space-y-4">
         
         <!-- Full Name -->
@@ -186,6 +193,38 @@
           </small>
         </div>
 
+        <div class="form-field">
+          <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            تاريخ الميلاد
+          </label>
+          <input
+            pInputText
+            id="dateOfBirth"
+            type="date"
+            formControlName="dateOfBirth"
+            class="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+          />
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('dateOfBirth')">
+            {{ getFieldError('dateOfBirth') }}
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="address" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+            العنوان
+          </label>
+          <input
+            pInputText
+            id="address"
+            formControlName="address"
+            placeholder="أدخل عنوانك"
+            class="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+          />
+          <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('address')">
+            {{ getFieldError('address') }}
+          </small>
+        </div>
+
         <!-- Study Year -->
         <div class="form-field">
           <label for="studyYear" class="block text-sm font-medium text-gray-700 mb-2 text-right">
@@ -325,24 +364,6 @@
           </div>
         </div>
 
-        <!-- File Upload -->
-        <div class="form-field">
-          <label class="block text-sm font-medium text-gray-700 mb-2 text-right">
-            ارفع صورة البطاقة / شهادة ميلادك
-          </label>
-          <p-fileUpload 
-            mode="basic" 
-            chooseLabel="اختر الملف"
-            accept="image/*"
-            maxFileSize="5000000"
-            (onSelect)="onFileSelect($event, 'idImage')"
-            styleClass="w-full"
-          ></p-fileUpload>
-          <small class="text-gray-500 text-right block mt-1 text-xs">
-            حجم الصورة يجب أن يكون أقل من 5 ميجابايت ونسبة الصورة 1:1
-          </small>
-        </div>
-
         <!-- Submit Button -->
         <div class="pt-4">
           <button 
@@ -350,7 +371,8 @@
             type="submit"
             label="طلب إنشاء حساب"
             class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 lg:py-3 px-4 rounded-lg font-medium transition-colors text-sm lg:text-base"
-            [disabled]="registrationForm.invalid"
+            [disabled]="registrationForm.invalid || isLoading"
+            [loading]="isLoading"
           ></button>
         </div>
       </form>

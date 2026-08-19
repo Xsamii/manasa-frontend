@@ -15,6 +15,7 @@
           
           <!-- Wallet Balance -->
           <button 
+            *ngIf="isStudent"
             class="flex items-center bg-white border border-gray-200 px-2 md:px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
             routerLink="/wallet"
           >
@@ -26,13 +27,32 @@
           <div class="relative">
             <button
               class="p-2 text-gray-600 hover:text-gray-800 relative"
-              (click)="showNotifications()"
+              (click)="showNotifications(notificationsPanel, $event)"
             >
               <i class="pi pi-bell text-lg"></i>
-              <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+              <span *ngIf="notificationCount" class="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                 {{ notificationCount }}
               </span>
             </button>
+            <p-overlayPanel #notificationsPanel>
+              <div class="w-80 max-w-[80vw]" dir="rtl">
+                <div class="flex justify-between items-center border-b pb-2 mb-2">
+                  <strong>الإشعارات</strong>
+                  <button *ngIf="notificationCount" class="text-xs text-orange-600" (click)="markAllRead()">تحديد الكل كمقروء</button>
+                </div>
+                <button
+                  *ngFor="let item of notifications"
+                  class="block w-full text-right p-3 rounded-lg hover:bg-slate-50"
+                  [class.bg-orange-50]="!item.readAt"
+                  (click)="openNotification(item)"
+                >
+                  <strong class="block text-sm">{{ item.title }}</strong>
+                  <span class="block text-xs text-slate-600 mt-1">{{ item.message }}</span>
+                  <span class="block text-[11px] text-slate-400 mt-1">{{ item.createdAt | date:'short' }}</span>
+                </button>
+                <p *ngIf="!notifications.length" class="text-center text-slate-500 p-6">لا توجد إشعارات.</p>
+              </div>
+            </p-overlayPanel>
           </div>
 
           <!-- Profile Menu -->
@@ -54,7 +74,7 @@
             <i class="pi pi-user text-xl text-white"></i>
           </div>
         </div>
-        <p class="font-medium text-white text-center">أهلاً عمر محمد نجم محمد</p>
+        <p class="font-medium text-white text-center">أهلاً {{ currentUser?.fullName }}</p>
       </div>
       
       <!-- Menu Items -->
@@ -71,6 +91,7 @@
         
         <!-- Student Forum -->
         <a 
+          *ngIf="isStudent"
           routerLink="/forum" 
           class="menu-item"
           (click)="profileMenu.hide()"
@@ -81,6 +102,7 @@
         
         <!-- Recharge Code -->
         <a 
+          *ngIf="isStudent"
           routerLink="/code-recharge" 
           class="menu-item"
           (click)="profileMenu.hide()"
@@ -90,7 +112,7 @@
         </a>
         
         <!-- My Account with Submenu -->
-        <div class="menu-item submenu-toggle" 
+        <div *ngIf="isStudent" class="menu-item submenu-toggle"
              [class.active]="showAccountSubmenu"
              (click)="toggleAccountSubmenu()">
           <span class="text-right">حسابي</span>
@@ -102,7 +124,7 @@
         </div>
         
         <!-- Account Submenu -->
-        <div class="submenu" [class.open]="showAccountSubmenu">
+        <div *ngIf="isStudent" class="submenu" [class.open]="showAccountSubmenu">
           <a 
             routerLink="/code-recharge" 
             class="submenu-item"
@@ -191,27 +213,30 @@
             امتحان خاص بيك
           </a>
           
+        </div>
+        
           <a 
             routerLink="/security" 
-            class="submenu-item"
+            class="menu-item"
             (click)="profileMenu.hide()"
           >
-            الأمان و تسجيل الدخول
+            <span class="text-right">الأمان والجلسات</span>
+            <i class="pi pi-lock menu-icon"></i>
           </a>
-        </div>
         
         <!-- My Courses -->
         <a 
-          routerLink="/courses" 
+          [routerLink]="isTeacher ? '/teacher' : '/courses'"
           class="menu-item"
           (click)="profileMenu.hide()"
         >
-          <span class="text-right">كورساتي</span>
+          <span class="text-right">{{ isTeacher ? 'إدارة الكورسات' : 'كورساتي' }}</span>
           <i class="pi pi-book menu-icon"></i>
         </a>
         
         <!-- My Wallet -->
         <a 
+          *ngIf="isStudent"
           routerLink="/wallet" 
           class="menu-item"
           (click)="profileMenu.hide()"
@@ -250,7 +275,9 @@
           <div class="relative hidden md:block">
             <input
               type="text"
-              placeholder="بحث..."
+              placeholder="بحث في الكورسات..."
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="searchCourses()"
               class="w-72 lg:w-80 pr-4 pl-10 py-2 bg-gray-100 border border-gray-200 rounded-lg text-right text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition-colors"
             />
             <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -274,7 +301,9 @@
         <div class="relative">
           <input
             type="text"
-            placeholder="بحث..."
+            placeholder="بحث في الكورسات..."
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="searchCourses()"
             class="w-full pr-4 pl-10 py-2 bg-gray-100 border border-gray-200 rounded-lg text-right text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white transition-colors"
           />
           <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>

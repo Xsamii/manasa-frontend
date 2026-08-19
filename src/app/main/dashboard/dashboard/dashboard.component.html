@@ -24,7 +24,7 @@
                 <!-- Video/Image Area (no white container) -->
                 <div class="relative w-96 h-60 bg-gray-200 rounded-3xl overflow-hidden">
                   <img 
-                    src="assets/images/hero-students.jpg" 
+                    src="assets/images/hero-students.svg" 
                     alt="Students learning" 
                     class="w-full h-full object-cover"
                   />
@@ -74,10 +74,10 @@
       <div class=" mx-auto px-6">
         <div class="grid grid-cols-4 gap-6 items-center">
        
-          <!-- موادي (Materials) -->
+          <!-- Forum -->
           <div class="bg-[#FFF0F0] w-full rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
-          routerLink="/materials">
-          <h3 class="font-semibold text-gray-800">موادي</h3>
+          routerLink="/forum">
+          <h3 class="font-semibold text-gray-800">منتدى الكورسات</h3>
             <div class="w-12 h-12">
               <img src="assets/icons/subjects.svg" alt="">
             </div>
@@ -101,14 +101,71 @@
             </div>
           </div>
             
-          <!-- مسابقة (Competition) -->
+          <!-- Statistics -->
           <div class="bg-[#EBEBFF] rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
-               routerLink="/competitions">
-               <h3 class="font-semibold text-gray-800">مسابقة</h3>
+               routerLink="/statistics/platform">
+               <h3 class="font-semibold text-gray-800">إحصائياتي</h3>
             <div class="w-12 h-12 ">
               <img src="assets/icons/competition.svg" alt="">
             </div>
           </div>
         </div>
       </div>
+
+      <section class="mx-auto px-6 mt-10" dir="rtl">
+        <div class="bg-white rounded-xl p-5 shadow-sm">
+          <h2 class="text-xl font-bold mb-1">آخر الإشعارات</h2>
+          <p class="text-sm text-slate-500 mb-4">{{ unreadNotifications }} غير مقروء</p>
+          <button
+            *ngFor="let item of recentNotifications"
+            class="block w-full text-right border-t p-3 hover:bg-slate-50"
+            [class.font-semibold]="!item.readAt"
+            (click)="openNotification(item)"
+          >
+            <span class="block">{{ item.title }}</span>
+            <small class="text-slate-500">{{ item.message }}</small>
+          </button>
+          <p *ngIf="!recentNotifications.length" class="text-slate-500 text-center py-4">لا توجد إشعارات.</p>
+        </div>
+      </section>
+
+      <section class="mx-auto px-6 mt-12" dir="rtl">
+        <div class="flex justify-between items-center mb-5">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800">تابع تعلّمك</h2>
+            <p class="text-gray-500">
+              {{ enrolledCourses }} كورس · {{ completedLessons }} درس مكتمل
+            </p>
+          </div>
+          <a routerLink="/courses" class="text-orange-600 font-semibold">عرض كل الكورسات</a>
+        </div>
+
+        <div *ngIf="isLoadingCourses" class="bg-white rounded-xl p-8 text-center">
+          جار تحميل كورساتك...
+        </div>
+        <div *ngIf="coursesError" class="bg-red-50 text-red-700 rounded-xl p-6 text-center">
+          <p>{{ coursesError }}</p>
+          <button (click)="loadCourses()" class="mt-3 px-5 py-2 bg-teal-700 text-white rounded-lg">
+            إعادة المحاولة
+          </button>
+        </div>
+        <div *ngIf="!isLoadingCourses && !coursesError && recentCourses.length === 0"
+             class="bg-white rounded-xl p-8 text-center text-gray-500">
+          لم تسجل في أي كورس بعد.
+          <a routerLink="/courses" class="block mt-3 text-orange-600">استعرض الكورسات المتاحة</a>
+        </div>
+
+        <div *ngIf="!isLoadingCourses && recentCourses.length" class="grid grid-cols-3 gap-5">
+          <a *ngFor="let course of recentCourses"
+             [routerLink]="['/courses', course.id]"
+             class="block bg-white rounded-xl p-5 shadow-sm hover:shadow-md">
+            <span class="text-sm text-teal-700">{{ course.instructor?.name || 'فريق المنصة' }}</span>
+            <h3 class="font-bold text-gray-800 my-2">{{ course.title }}</h3>
+            <div class="h-2 bg-gray-200 rounded overflow-hidden">
+              <div class="h-full bg-orange-500" [style.width.%]="course.progressPercentage || 0"></div>
+            </div>
+            <small class="text-gray-500">{{ course.progressPercentage || 0 }}% مكتمل</small>
+          </a>
+        </div>
+      </section>
     </div>

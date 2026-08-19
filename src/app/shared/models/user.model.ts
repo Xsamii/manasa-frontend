@@ -1,13 +1,9 @@
 export interface User {
-  id: string;
+  id: number;
   fullName: string;
   email: string;
   phoneNumber: string;
-  profileImage?: string;
   role: UserRole;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export enum UserRole {
@@ -27,6 +23,8 @@ export interface UserRegistration {
   schoolName: string;
   jobTitle: string;
   governorate: string;
+  dateOfBirth: string;
+  address: string;
   studyYear: string;
   gender: string;
   sector: string;
@@ -34,6 +32,10 @@ export interface UserRegistration {
   email: string;
   password: string;
   confirmPassword: string;
-  profileImage?: File;
-  idImage?: File;
+}
+
+export interface AuthSession {
+  sessionId: string;
+  expiresAt: string;
+  user: User;
 }

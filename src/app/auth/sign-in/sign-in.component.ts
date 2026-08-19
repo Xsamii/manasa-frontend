@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { AuthService } from '../../shared/services/auth.service';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageModule } from 'primeng/message';
+import { UserRole } from '../../shared/models/user.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-sign-in',
@@ -20,31 +22,61 @@ import { MessageModule } from 'primeng/message';
     PasswordModule,
     ButtonModule,
     CheckboxModule,
-    MessageModule
+    MessageModule,
   ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss'
 })
-export class SignInComponent {
-loginForm!: FormGroup;
+export class SignInComponent implements OnInit {
+  loginForm!: FormGroup;
   isLoading = false;
   errorMessage = '';
+  role: UserRole = UserRole.STUDENT;
+  readonly showDemoHint = !environment.production;
+  readonly demoPassword = 'Demo@1234';
+  readonly demoStudent = {
+    name: 'سارة علي',
+    email: 'sara.student@manasa.test',
+  };
+  readonly demoTeacher = {
+    name: 'أحمد محمود',
+    email: 'ahmed.math@manasa.test',
+  };
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
-  ngOnInit(): void {
-    this.initializeForm();
+  get isTeacher(): boolean {
+    return this.role === UserRole.TEACHER;
   }
 
-  private initializeForm(): void {
+  get demoAccount() {
+    return this.isTeacher ? this.demoTeacher : this.demoStudent;
+  }
+
+  ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false]
+      password: ['', [Validators.required]],
+      rememberMe: [false],
+    });
+    this.route.data.subscribe(data => {
+      this.role = data['role'] === UserRole.TEACHER
+        ? UserRole.TEACHER
+        : UserRole.STUDENT;
+      this.loginForm.patchValue({ email: '', password: '' });
+      this.errorMessage = '';
+    });
+  }
+
+  fillDemoAccount(): void {
+    this.loginForm.patchValue({
+      email: this.demoAccount.email,
+      password: this.demoPassword,
     });
   }
 
@@ -52,19 +84,25 @@ loginForm!: FormGroup;
     if (this.loginForm.valid) {
       this.isLoading = true;
       this.errorMessage = '';
-      
       const { email, password } = this.loginForm.value;
-      
-      this.authService.signIn(email, password).subscribe({
-        next: (response: { success: any; message: string; }) => {
+
+      this.authService.signIn(email, password, this.role).subscribe({
+        next: response => {
           this.isLoading = false;
           if (response.success) {
-            this.router.navigate(['/dashboard']);
+            const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+            void this.router.navigateByUrl(
+              returnUrl?.startsWith('/') && !returnUrl.startsWith('//')
+                ? returnUrl
+                : this.isTeacher
+                  ? '/teacher'
+                  : '/dashboard',
+            );
           } else {
             this.errorMessage = response.message || 'حدث خطأ أثناء تسجيل الدخول';
           }
         },
-        error: (error: { error: { message: string; }; }) => {
+        error: error => {
           this.isLoading = false;
           this.errorMessage = error.error?.message || 'حدث خطأ أثناء تسجيل الدخول';
         }
@@ -90,7 +128,6 @@ loginForm!: FormGroup;
     if (field?.errors) {
       if (field.errors['required']) return 'هذا الحقل مطلوب';
       if (field.errors['email']) return 'البريد الإلكتروني غير صحيح';
-      if (field.errors['minlength']) return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
     }
     return '';
   }

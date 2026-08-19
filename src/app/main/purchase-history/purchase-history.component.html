@@ -14,7 +14,11 @@
       </div>
       
       <!-- Purchase History Timeline -->
-      <div class="purchase-timeline">
+      <p *ngIf="errorMessage" class="text-center text-red-600 py-6" role="alert">{{ errorMessage }}</p>
+      <p *ngIf="!isLoading && !errorMessage && !purchases.length" class="text-center text-gray-500 py-10">
+        لا توجد مشتريات بعد.
+      </p>
+      <div class="purchase-timeline" *ngIf="!isLoading && !errorMessage && purchases.length">
         
         <!-- Purchase Date Header -->
         <div *ngFor="let dateGroup of groupedPurchases; let isFirst = first; let isLast = last" class="timeline-group">

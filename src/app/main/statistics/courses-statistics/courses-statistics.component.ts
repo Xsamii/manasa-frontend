@@ -2,15 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumb/breadcrumb.component';
-
-interface CourseStatistics {
-  videosWatched: number;
-  totalVideos: number;
-  testsCompleted: number;
-  totalTests: number;
-  highestScore: number;
-  maxScore: number;
-}
+import { CourseStatistics, StatisticsService } from '../../../shared/services/statistics.service';
 
 @Component({
   selector: 'app-courses-statistics',
@@ -30,13 +22,18 @@ export class CoursesStatisticsComponent implements OnInit {
   ];
 
   statistics: CourseStatistics = {
-    videosWatched: 49,
-    totalVideos: 129,
-    testsCompleted: 15,
-    totalTests: 129,
-    highestScore: 95,
-    maxScore: 100
+    videosWatched: 0,
+    totalVideos: 0,
+    videosPercentage: 0,
+    testsCompleted: 0,
+    totalTests: 0,
+    testsPercentage: 0,
+    highestScore: 0,
+    maxScore: 0,
+    scorePercentage: 0,
   };
+  constructor(private readonly statisticsService: StatisticsService) {}
+
 
   isLoading = false;
 
@@ -47,29 +44,26 @@ export class CoursesStatisticsComponent implements OnInit {
   loadStatistics(): void {
     this.isLoading = true;
     
-    // Simulate API call
-    setTimeout(() => {
-      // In real implementation, you would fetch data from API
-      // this.statisticsService.getCoursesStatistics().subscribe(data => {
-      //   this.statistics = data;
-      //   this.isLoading = false;
-      // });
-      
-      this.isLoading = false;
-    }, 1000);
+    this.statisticsService.getCourseStatistics().subscribe({
+      next: response => {
+        if (response.success) this.statistics = response.data;
+        this.isLoading = false;
+      },
+      error: () => this.isLoading = false,
+    });
   }
 
   // Calculate percentages
   getVideosWatchedPercentage(): number {
-    return Math.round((this.statistics.videosWatched / this.statistics.totalVideos) * 100);
+    return this.statistics.videosPercentage;
   }
 
   getTestsCompletedPercentage(): number {
-    return Math.round((this.statistics.testsCompleted / this.statistics.totalTests) * 100);
+    return this.statistics.testsPercentage;
   }
 
   getHighestScorePercentage(): number {
-    return Math.round((this.statistics.highestScore / this.statistics.maxScore) * 100);
+    return this.statistics.scorePercentage;
   }
 
   // SVG Circle calculations

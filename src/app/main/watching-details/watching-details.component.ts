@@ -3,14 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
 import { TableColumn, TableComponent } from '../../shared/components/table/table.component';
-
-interface WatchingDetail {
-  id: string;
-  videoTitle: string;
-  courseName: string;
-  watchDuration: string;
-  watchDate: Date;
-}
+import { StatisticsService, WatchingDetail } from '../../shared/services/statistics.service';
 
 @Component({
   selector: 'app-watching-details',
@@ -47,122 +40,36 @@ export class WatchingDetailsComponent implements OnInit {
       label: 'مشاهدة الفيديو',
       command: (data: any) => this.watchVideo(data)
     },
-    {
-      icon: 'pi pi-eye',
-      label: 'عرض التفاصيل',
-      command: (data: any) => this.viewDetails(data)
-    },
-    {
-      icon: 'pi pi-bookmark',
-      label: 'إضافة للمفضلة',
-      command: (data: any) => this.addToFavorites(data)
-    }
   ];
 
-  watchingDetails: WatchingDetail[] = [
-    {
-      id: '12323',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '3434',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '656456',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '12323',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '3434',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '656456',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '12323',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '656456',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '3434',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    },
-    {
-      id: '656456',
-      videoTitle: 'دبلوم الوادي',
-      courseName: 'دبلوم الوادي',
-      watchDuration: 'لم يتم تشغيل الفيديو',
-      watchDate: new Date('2025-11-05')
-    }
-  ];
+  watchingDetails: Array<WatchingDetail & { watchDuration: string }> = [];
+
+  constructor(private readonly statistics: StatisticsService) {}
 
   ngOnInit(): void {
-    this.totalRecords = this.watchingDetails.length;
     this.loadWatchingDetails();
   }
 
   loadWatchingDetails(): void {
     this.isLoadingWatchingDetails = true;
     
-    // Simulate API call
-    setTimeout(() => {
-      this.isLoadingWatchingDetails = false;
-    }, 1000);
+    this.statistics.getWatchingDetails(1, 50).subscribe({
+      next: response => {
+        if (response.success) {
+          this.watchingDetails = response.data.items.map(item => ({
+            ...item,
+            watchDuration: this.formatDuration(item.watchTimeSeconds),
+          }));
+          this.totalRecords = response.data.totalRecords;
+        }
+        this.isLoadingWatchingDetails = false;
+      },
+      error: () => this.isLoadingWatchingDetails = false,
+    });
   }
 
   watchVideo(detail: WatchingDetail): void {
-    console.log('Watch video:', detail);
-    // Navigate to video player or open video modal
-    // this.router.navigate(['/video', detail.id]);
-    alert(`بدء تشغيل: ${detail.videoTitle}`);
-  }
-
-  viewDetails(detail: WatchingDetail): void {
-    console.log('View details:', detail);
-    // Navigate to detailed view or open modal
-    // this.router.navigate(['/watching-details', detail.id]);
-  }
-
-  addToFavorites(detail: WatchingDetail): void {
-    console.log('Add to favorites:', detail);
-    // Implement add to favorites logic
-    alert(`تم إضافة "${detail.videoTitle}" إلى المفضلة`);
+    window.location.href = `/courses/${detail.courseId}`;
   }
 
   exportWatchingDetails(): void {
@@ -206,7 +113,7 @@ export class WatchingDetailsComponent implements OnInit {
         detail.videoTitle,
         detail.courseName,
         detail.watchDuration,
-        detail.watchDate.toLocaleDateString('ar-EG')
+        new Date(detail.watchDate).toLocaleDateString('ar-EG')
       ];
       csvRows.push(row.join(','));
     });
@@ -227,5 +134,11 @@ export class WatchingDetailsComponent implements OnInit {
       link.click();
       document.body.removeChild(link);
     }
+  }
+
+  private formatDuration(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return hours ? `${hours} س ${minutes} د` : `${minutes} دقيقة`;
   }
 }

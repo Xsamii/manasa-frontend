@@ -4,12 +4,26 @@ export interface DropdownOption {
   disabled?: boolean;
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
+export interface ApiSuccessResponse<T> {
+  success: true;
   data: T;
   message: string;
+  timestamp: string;
+  path: string;
   totalRecords?: number;
 }
+
+export interface ApiErrorResponse {
+  success: false;
+  data: null;
+  message: string;
+  errors?: string[] | Record<string, unknown>;
+  statusCode: number;
+  timestamp: string;
+  path: string;
+}
+
+export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
 
 export interface PaginatedData<T> {
   items: T[];

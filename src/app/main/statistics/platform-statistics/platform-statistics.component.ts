@@ -2,14 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumb/breadcrumb.component';
-
-
-interface PlatformStatistics {
-  lectureTime: string;
-  videoViews: number;
-  quizOpening: number;
-  testCompletion: number;
-}
+import { PlatformStatistics, StatisticsService } from '../../../shared/services/statistics.service';
 
 @Component({
   selector: 'app-platform-statistics',
@@ -29,11 +22,15 @@ export class PlatformStatisticsComponent implements OnInit {
   ];
 
   statistics: PlatformStatistics = {
-    lectureTime: 'ساعتان',
-    videoViews: 34,
-    quizOpening: 0,
-    testCompletion: 0
+    enrolledCourses: 0,
+    totalLectureTime: 0,
+    totalVideoWatches: 0,
+    completedLessons: 0,
+    totalQuizOpens: 0,
+    totalQuizCompletions: 0,
   };
+  constructor(private readonly statisticsService: StatisticsService) {}
+
 
   isLoading = false;
 
@@ -44,16 +41,13 @@ export class PlatformStatisticsComponent implements OnInit {
   loadStatistics(): void {
     this.isLoading = true;
     
-    // Simulate API call
-    setTimeout(() => {
-      // In real implementation, you would fetch data from API
-      // this.statisticsService.getPlatformStatistics().subscribe(data => {
-      //   this.statistics = data;
-      //   this.isLoading = false;
-      // });
-      
-      this.isLoading = false;
-    }, 1000);
+    this.statisticsService.getPlatformStatistics().subscribe({
+      next: response => {
+        if (response.success) this.statistics = response.data;
+        this.isLoading = false;
+      },
+      error: () => this.isLoading = false,
+    });
   }
 
   refreshStatistics(): void {
@@ -61,8 +55,10 @@ export class PlatformStatisticsComponent implements OnInit {
   }
 
   // Helper methods for formatting
-  formatTime(timeString: string): string {
-    return timeString;
+  formatTime(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours} ساعة ${minutes} دقيقة`;
   }
 
   formatCount(count: number): string {
@@ -73,10 +69,10 @@ export class PlatformStatisticsComponent implements OnInit {
   getStatisticsSummary(): string {
     return `
 إحصائياتك علي المنصة:
-- إجمالي مدة فتح المحاضرات: ${this.statistics.lectureTime}
-- إجمالي عدد مرات مشاهدة الفيديوهات: ${this.formatCount(this.statistics.videoViews)}
-- إجمالي عدد مرات فتح الاختبار: ${this.formatCount(this.statistics.quizOpening)}
-- إجمالي عدد مرات إنهاء الاختبارات: ${this.formatCount(this.statistics.testCompletion)}
+- إجمالي مدة فتح المحاضرات: ${this.formatTime(this.statistics.totalLectureTime)}
+- إجمالي عدد مرات مشاهدة الفيديوهات: ${this.formatCount(this.statistics.totalVideoWatches)}
+- إجمالي عدد مرات فتح الاختبار: ${this.formatCount(this.statistics.totalQuizOpens)}
+- إجمالي عدد مرات إنهاء الاختبارات: ${this.formatCount(this.statistics.totalQuizCompletions)}
     `;
   }
 

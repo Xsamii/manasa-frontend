@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 import { StudentForumComponent } from './student-forum.component';
+import { CourseService } from '../../shared/services/course.service';
 
 describe('StudentForumComponent', () => {
   let component: StudentForumComponent;
@@ -9,6 +13,25 @@ describe('StudentForumComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [StudentForumComponent]
+      ,providers: [
+        provideHttpClient(),
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { queryParamMap: { get: () => null } } },
+        },
+        {
+          provide: CourseService,
+          useValue: {
+            getMyCourses: () => of({
+              success: true,
+              data: [],
+              message: 'ok',
+              timestamp: '',
+              path: '',
+            }),
+          },
+        },
+      ]
     })
     .compileComponents();
 

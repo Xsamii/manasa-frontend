@@ -1,0 +1,195 @@
+:host {
+  display: block;
+  direction: rtl;
+}
+
+.workspace {
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: #f5f7f8;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.curriculum,
+.lesson-view,
+.state-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(15, 118, 110, 0.08);
+}
+
+.curriculum {
+  padding: 1rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.curriculum-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    margin: 0;
+    color: #134e4a;
+  }
+}
+
+.progress-track {
+  height: 8px;
+  margin: 1rem 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e5e7eb;
+
+  div {
+    height: 100%;
+    background: #f97316;
+    transition: width 0.2s ease;
+  }
+}
+
+.lesson-item {
+  display: flex;
+  width: 100%;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  background: transparent;
+  text-align: right;
+  cursor: pointer;
+
+  &:hover,
+  &.active {
+    border-color: #99f6e4;
+    background: #f0fdfa;
+  }
+
+  &.completed .lesson-order {
+    background: #16a34a;
+  }
+
+  small {
+    display: block;
+    margin-top: 0.2rem;
+    color: #6b7280;
+  }
+}
+
+.lesson-order {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  border-radius: 50%;
+  color: white;
+  background: #0f766e;
+}
+
+.lesson-view {
+  overflow: hidden;
+}
+
+.video-shell {
+  background: #111827;
+
+  video {
+    display: block;
+    width: 100%;
+    max-height: 65vh;
+  }
+}
+
+.no-video {
+  min-height: 18rem;
+  display: grid;
+  place-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  color: #6b7280;
+  background: #e5e7eb;
+
+  i {
+    font-size: 3rem;
+  }
+}
+
+.lesson-copy {
+  padding: 2rem;
+
+  h1 {
+    margin: 0.4rem 0 0.8rem;
+    color: #1f2937;
+  }
+
+  p {
+    line-height: 1.9;
+    color: #4b5563;
+  }
+}
+
+.eyebrow {
+  color: #f97316;
+  font-weight: 700;
+}
+
+.lesson-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  color: #6b7280;
+}
+
+.complete-button,
+.state-card button {
+  border: 0;
+  border-radius: 0.65rem;
+  padding: 0.75rem 1.2rem;
+  color: white;
+  background: #0f766e;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+    background: #16a34a;
+  }
+}
+
+.state-card {
+  padding: 2rem;
+  text-align: center;
+
+  &.error {
+    color: #b91c1c;
+  }
+}
+
+.empty-lessons {
+  padding: 1rem;
+  color: #6b7280;
+}
+
+@media (max-width: 850px) {
+  .workspace {
+    padding: 1rem;
+  }
+
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .curriculum {
+    position: static;
+  }
+}

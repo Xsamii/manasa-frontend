@@ -2,67 +2,116 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PaginatedData } from '../models/common.model';
+import { apiUrl } from '../../core/config/api.config';
 
 export interface ForumPost {
-  id: string;
+  id: number;
+  courseId: number;
   title: string;
   content: string;
   author: {
-    id: string;
+    id: number;
     name: string;
-    avatar?: string;
+    type: 'student' | 'teacher';
   };
-  subject: string;
-  createdAt: Date;
+  state: 'active' | 'hidden' | 'locked';
+  createdAt: string;
+  updatedAt: string;
   repliesCount: number;
-  lastReply?: Date;
+  canEdit: boolean;
+  canModerate: boolean;
 }
 
 export interface ForumReply {
-  id: string;
+  id: number;
+  topicId: number;
   content: string;
   author: {
-    id: string;
+    id: number;
     name: string;
-    avatar?: string;
+    type: 'student' | 'teacher';
   };
-  createdAt: Date;
+  state: 'active' | 'hidden' | 'locked';
+  createdAt: string;
+  updatedAt: string;
+  canEdit: boolean;
+  canModerate: boolean;
+}
+
+export interface ForumReport {
+  id: number;
+  courseId: number;
+  targetType: 'topic' | 'reply';
+  targetId: number;
+  reason: string;
+  state: 'pending' | 'resolved' | 'dismissed';
+  createdAt: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ForumService {
-  private readonly API_URL = '/api/forum';
+  private readonly API_URL = apiUrl('forum');
 
   constructor(private http: HttpClient) {}
 
-  // Get forum posts
-  getPosts(subject?: string, params?: any): Observable<ApiResponse<PaginatedData<ForumPost>>> {
-    return this.http.get<ApiResponse<PaginatedData<ForumPost>>>(`${this.API_URL}/posts`, {
-      params: { subject, ...params }
+  getPosts(courseId: number, page = 1, pageSize = 10): Observable<ApiResponse<PaginatedData<ForumPost>>> {
+    return this.http.get<ApiResponse<PaginatedData<ForumPost>>>(`${this.API_URL}/courses/${courseId}/topics`, {
+      params: { page, pageSize }
     });
   }
 
-  // Get post details with replies
-  getPost(postId: string): Observable<ApiResponse<ForumPost & { replies: ForumReply[] }>> {
-    return this.http.get<ApiResponse<ForumPost & { replies: ForumReply[] }>>(`${this.API_URL}/posts/${postId}`);
+  getPost(postId: number, page = 1): Observable<ApiResponse<ForumPost & { replies: ForumReply[] }>> {
+    return this.http.get<ApiResponse<ForumPost & { replies: ForumReply[] }>>(`${this.API_URL}/topics/${postId}`, {
+      params: { page }
+    });
   }
 
-  // Create new post
-  createPost(post: Partial<ForumPost>): Observable<ApiResponse<ForumPost>> {
-    return this.http.post<ApiResponse<ForumPost>>(`${this.API_URL}/posts`, post);
+  createPost(courseId: number, post: Pick<ForumPost, 'title' | 'content'>): Observable<ApiResponse<ForumPost>> {
+    return this.http.post<ApiResponse<ForumPost>>(`${this.API_URL}/courses/${courseId}/topics`, post);
   }
 
-  // Reply to post
-  replyToPost(postId: string, content: string): Observable<ApiResponse<ForumReply>> {
-    return this.http.post<ApiResponse<ForumReply>>(`${this.API_URL}/posts/${postId}/replies`, {
+  updatePost(postId: number, post: Partial<ForumPost>): Observable<ApiResponse<ForumPost>> {
+    return this.http.patch<ApiResponse<ForumPost>>(`${this.API_URL}/topics/${postId}`, post);
+  }
+
+  deletePost(postId: number): Observable<ApiResponse<{ deleted: true }>> {
+    return this.http.delete<ApiResponse<{ deleted: true }>>(`${this.API_URL}/topics/${postId}`);
+  }
+
+  replyToPost(postId: number, content: string): Observable<ApiResponse<ForumReply>> {
+    return this.http.post<ApiResponse<ForumReply>>(`${this.API_URL}/topics/${postId}/replies`, {
       content
     });
   }
 
-  // Get forum subjects
-  getSubjects(): Observable<ApiResponse<string[]>> {
-    return this.http.get<ApiResponse<string[]>>(`${this.API_URL}/subjects`);
+  updateReply(replyId: number, content: string): Observable<ApiResponse<ForumReply>> {
+    return this.http.patch<ApiResponse<ForumReply>>(`${this.API_URL}/replies/${replyId}`, { content });
+  }
+
+  deleteReply(replyId: number): Observable<ApiResponse<{ deleted: true }>> {
+    return this.http.delete<ApiResponse<{ deleted: true }>>(`${this.API_URL}/replies/${replyId}`);
+  }
+
+  report(target: 'topic' | 'reply', id: number, reason: string): Observable<ApiResponse<unknown>> {
+    return this.http.post<ApiResponse<unknown>>(`${this.API_URL}/${target}/${id}/report`, { reason });
+  }
+
+  moderationQueue(courseId: number): Observable<ApiResponse<PaginatedData<ForumReport>>> {
+    return this.http.get<ApiResponse<PaginatedData<ForumReport>>>(
+      `${this.API_URL}/teacher/courses/${courseId}/moderation`,
+    );
+  }
+
+  moderate(
+    reportId: number,
+    action: 'hide' | 'lock' | 'restore' | 'dismiss',
+    reason?: string,
+  ): Observable<ApiResponse<ForumReport>> {
+    return this.http.post<ApiResponse<ForumReport>>(
+      `${this.API_URL}/teacher/reports/${reportId}/moderate`,
+      { action, reason },
+    );
   }
 }

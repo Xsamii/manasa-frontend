@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
+import { WalletService } from '../../shared/services/wallet.service';
 
 interface Purchase {
   id: string;
@@ -42,6 +43,9 @@ export class PurchaseHistoryComponent implements OnInit {
   isLoading = false;
   purchases: Purchase[] = [];
   groupedPurchases: PurchaseGroup[] = [];
+  errorMessage = '';
+
+  constructor(private wallet: WalletService) {}
 
   ngOnInit(): void {
     this.loadPurchaseHistory();
@@ -50,74 +54,32 @@ export class PurchaseHistoryComponent implements OnInit {
   loadPurchaseHistory(): void {
     this.isLoading = true;
     
-    // Simulate API call
-    setTimeout(() => {
-      this.purchases = [
-        {
-          id: '1',
-          title: 'محاضرة الواجب ( طلبة يوم الأحد - المراجعة 5',
-          instructor: 'م/ محمد صلاح كرت',
-          amount: 200,
-          time: '1st September, 2021 at 11:30 PM',
-          date: new Date('2021-09-01'),
-          paymentMethod: 'شحن كود سحر',
-          hasImage: true,
-          image: 'assets/images/courses/course-1.jpg',
-          status: 'completed',
-          isExpanded: false
-        },
-        {
-          id: '2',
-          title: 'محاضرة الواجب ( طلبة يوم الأحد - المراجعة 5',
-          instructor: 'م/ محمد صلاح كرت',
-          amount: 200,
-          time: '1st September, 2021 at 11:43 PM',
-          date: new Date('2021-09-01'),
-          paymentMethod: 'Credit Card',
-          hasImage: true,
-          image: 'assets/images/courses/course-2.jpg',
-          status: 'completed',
-          isExpanded: false
-        },
-        {
-          id: '3',
-          title: '',
-          instructor: '',
-          amount: 200,
-          time: '1st October, 2021 at 12:65 PM',
-          date: new Date('2021-10-01'),
-          paymentMethod: 'شحن كود سحر',
-          hasImage: false,
-          status: 'completed',
-          isExpanded: false,
-        },
-        {
-          id: '4',
-          title: '',
-          instructor: '',
-          amount: 200,
-          time: '1st September, 2021 at 11:44 PM',
-          date: new Date('2021-09-01'),
-          paymentMethod: 'شحن كود سحر',
-          hasImage: false,
-          status: 'completed'
-        },
-        {
-          id: '5',
-          title: '',
-          instructor: '',
-          amount: 200,
-          time: '1st November, 2021 at 11:22 AM',
-          date: new Date('2021-11-01'),
-          paymentMethod: 'شحن كود سحر',
-          hasImage: false,
-          status: 'completed'
-        }
-      ];
-      
-      this.groupPurchasesByDate();
-      this.isLoading = false;
-    }, 1000);
+    this.errorMessage = '';
+    this.wallet.getPurchaseHistory().subscribe({
+      next: response => {
+        this.purchases = response.success ? response.data.map(item => {
+          const date = new Date(item.createdAt);
+          return {
+            id: item.id,
+            title: item.title,
+            instructor: item.instructor ?? '',
+            amount: item.amount,
+            time: date.toLocaleTimeString('ar-EG'),
+            date,
+            paymentMethod: 'المحفظة',
+            hasImage: true,
+            status: item.status,
+            isExpanded: false,
+          };
+        }) : [];
+        this.groupPurchasesByDate();
+        this.isLoading = false;
+      },
+      error: error => {
+        this.errorMessage = error.error?.message ?? 'تعذر تحميل سجل المشتريات';
+        this.isLoading = false;
+      },
+    });
   }
  
   groupPurchasesByDate(): void {
@@ -169,8 +131,16 @@ export class PurchaseHistoryComponent implements OnInit {
   }
 
   downloadInvoice(purchase: Purchase): void {
-    console.log('Download invoice for:', purchase);
-    this.generateInvoice(purchase);
+    this.wallet.getReceipt(purchase.id).subscribe({
+      next: response => {
+        if (!response.success) return;
+        const blob = new Blob([JSON.stringify(response.data, null, 2)], {
+          type: 'application/json;charset=utf-8;',
+        });
+        this.downloadBlob(blob, `receipt-${purchase.id}.json`);
+      },
+      error: error => this.errorMessage = error.error?.message ?? 'تعذر تحميل الإيصال',
+    });
   }
 
   requestRefund(purchase: Purchase): void {
@@ -251,6 +221,15 @@ export class PurchaseHistoryComponent implements OnInit {
       link.click();
       document.body.removeChild(link);
     }
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   // Analytics methods

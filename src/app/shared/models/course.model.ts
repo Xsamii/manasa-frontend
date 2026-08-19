@@ -1,46 +1,68 @@
 export interface Course {
-  id: string;
+  id: number;
   title: string;
   description: string;
-  instructor: Instructor;
-  subject: string;
-  thumbnail: string;
-  price: number;
-  duration: string;
+  studyYear: string;
+  instructor: Instructor | null;
   lessonsCount: number;
   studentsCount: number;
-  rating: number;
-  isSubscribed: boolean;
-  progress?: number;
-  createdAt: Date;
-  updatedAt: Date;
+  isEnrolled: boolean;
+  progressPercentage?: number;
+  resumeLessonId?: number | null;
+  curriculumPreview?: LessonPreview[];
+  price: number;
+  currency: string;
 }
 
 export interface Instructor {
-  id: string;
+  id: number;
   name: string;
   title: string;
-  avatar?: string;
+}
+
+export interface LessonPreview {
+  id: number;
+  title: string;
+  description: string;
+  order: number;
 }
 
 export interface Lesson {
-  id: string;
-  courseId: string;
+  id: number;
+  courseId: number;
   title: string;
   description: string;
-  videoUrl: string;
-  duration: string;
+  videoUrl: string | null;
   order: number;
-  isCompleted: boolean;
-  canAccess: boolean;
+  videos: Array<{ id: number; title: string; url: string }>;
+  resources: Array<{ id: number; type: 'homework' | 'test'; title: string }>;
+  completed: boolean;
+  watchTimeSeconds: number;
+  lastPositionSeconds: number;
 }
 
 export interface CourseProgress {
-  courseId: string;
-  userId: string;
-  completedLessons: string[];
-  lastWatchedLesson?: string;
-  totalWatchTime: number;
+  courseId: number;
+  completedLessons: number[];
+  lastWatchedLessonId: number | null;
+  lastPositionSeconds: number;
+  totalWatchTimeSeconds: number;
   progressPercentage: number;
-  updatedAt: Date;
+  updatedAt: string | null;
+}
+
+export interface LessonProgress {
+  courseId: number;
+  lessonId: number;
+  watchTimeSeconds: number;
+  lastPositionSeconds: number;
+  completed: boolean;
+  completedAt: string | null;
+  updatedAt: string;
+}
+
+export interface EnrollmentResult {
+  courseId: number;
+  enrolled: true;
+  alreadyEnrolled: boolean;
 }

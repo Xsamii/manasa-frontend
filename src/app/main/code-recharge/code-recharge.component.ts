@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
+import { WalletService } from '../../shared/services/wallet.service';
 
 @Component({
   selector: 'app-code-recharge',
@@ -27,12 +28,13 @@ rechargeForm!: FormGroup;
   isLoading = false;
   errorMessage = '';
   isCodeInvalid = false;
+  successMessage = '';
 
   breadcrumbItems = [
     { label: 'شحن كود جديد', isActive: true }
   ];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private wallet: WalletService) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -40,76 +42,39 @@ rechargeForm!: FormGroup;
 
   private initializeForm(): void {
     this.rechargeForm = this.fb.group({
-      rechargeCode: ['', [Validators.required, Validators.pattern(/^\d{2}\s\d{2}\s\d{2}\s\d{2}\s\d{2}$/)]]
+      rechargeCode: ['', [Validators.required, Validators.maxLength(100)]]
     });
   }
 
   onCodeInput(event: any): void {
-    let value = event.target.value.replace(/\s/g, ''); // Remove spaces
-    
-    // Only allow numbers
-    value = value.replace(/[^\d]/g, '');
-    
-    // Limit to 11 digits
-    if (value.length > 11) {
-      value = value.substring(0, 11);
-    }
-    
-    // Format with spaces (XX XX XX XX XX)
-    let formattedValue = '';
-    for (let i = 0; i < value.length; i += 2) {
-      if (i > 0) formattedValue += ' ';
-      formattedValue += value.substring(i, i + 2);
-    }
-    
-    // Update form control
-    this.rechargeForm.patchValue({
-      rechargeCode: formattedValue
-    });
-    
-    // Clear previous error
+    const value = String(event.target.value).trimStart().toUpperCase();
+    this.rechargeForm.patchValue({ rechargeCode: value }, { emitEvent: false });
     this.errorMessage = '';
+    this.successMessage = '';
     this.isCodeInvalid = false;
-    
-    // Validate code length
-    if (value.length === 11) {
-      this.validateCode(value);
-    }
-  }
-
-  private validateCode(code: string): void {
-    // Example validation - you can customize this logic
-    const invalidCodes = ['13185936432']; // Example invalid code from image
-    
-    if (invalidCodes.includes(code)) {
-      this.errorMessage = 'لقد ادخلت كود شحن غير صحيح، برجاء التأكد و إعادة المحاولة';
-      this.isCodeInvalid = true;
-    } else {
-      this.errorMessage = '';
-      this.isCodeInvalid = false;
-    }
   }
 
   onSubmit(): void {
     if (this.rechargeForm.valid && !this.isCodeInvalid) {
       this.isLoading = true;
-      const code = this.rechargeForm.value.rechargeCode.replace(/\s/g, '');
-      
-      // Simulate API call
-      setTimeout(() => {
-        this.isLoading = false;
-        
-        // Check if code is valid (simulate server validation)
-        if (code === '13185936432') {
-          this.errorMessage = 'لقد ادخلت كود شحن غير صحيح، برجاء التأكد و إعادة المحاولة';
-          this.isCodeInvalid = true;
-        } else {
-          // Success case
-          console.log('Code recharged successfully:', code);
-          alert('تم شحن الكود بنجاح!');
+      const code = this.rechargeForm.value.rechargeCode.trim();
+      this.wallet.chargeWithCode(code).subscribe({
+        next: response => {
+          this.isLoading = false;
+          if (!response.success) {
+            this.errorMessage = response.message;
+            this.isCodeInvalid = true;
+            return;
+          }
+          this.successMessage = `تم الشحن بنجاح. الرصيد الحالي ${response.data.balance} ${response.data.currency}`;
           this.rechargeForm.reset();
-        }
-      }, 2000);
+        },
+        error: error => {
+          this.isLoading = false;
+          this.isCodeInvalid = true;
+          this.errorMessage = error.error?.message ?? 'تعذر شحن الكود. حاول مرة أخرى.';
+        },
+      });
     }
   }
 

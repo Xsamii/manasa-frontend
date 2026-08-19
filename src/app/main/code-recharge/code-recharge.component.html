@@ -20,7 +20,7 @@
             
             <div class="text-center mb-8">
               <p class="text-gray-600 text-lg leading-relaxed">
-                اكتب الكود المكون من 11 رقم علي الكارت الخاص بكود
+                اكتب كود الشحن الموجود على الكارت
                 <br>
                 الشحن بتاعك هنا عشان تشحنة علي محفظتك
               </p>
@@ -49,7 +49,7 @@
                   placeholder="أدخل كود الشحن الخاص بك"
                   class="w-full text-center bg-gray-200 text-lg py-4 px-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
                   [class.border-red-500]="isCodeInvalid"
-                  maxlength="14"
+                  maxlength="100"
                   (input)="onCodeInput($event)"
                 />
                 
@@ -60,6 +60,9 @@
               <div *ngIf="errorMessage" class="flex items-center justify-center text-red-500 text-sm">
                 <i class="pi pi-exclamation-circle ml-2"></i>
                 <span>{{ errorMessage }}</span>
+              </div>
+              <div *ngIf="successMessage" class="text-center text-green-600 text-sm" role="status">
+                {{ successMessage }}
               </div>
             </div>
 

@@ -1,16 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 
 // PrimeNG Imports
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
-import { FileUploadModule } from 'primeng/fileupload';
 import { InputMaskModule } from 'primeng/inputmask';
 import { PasswordModule } from 'primeng/password';
+import { MessageModule } from 'primeng/message';
+import { AuthService } from '../../shared/services/auth.service';
+import { Router } from '@angular/router';
+import { UserRegistration } from '../../shared/models/user.model';
 
 interface DropdownOption {
   label: string;
@@ -23,19 +32,20 @@ interface DropdownOption {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    HttpClientModule,
     InputTextModule,
     DropdownModule,
     ButtonModule,
-    FileUploadModule,
     InputMaskModule,
-    PasswordModule
+    PasswordModule,
+    MessageModule,
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
 })
 export class SignUpComponent implements OnInit {
   registrationForm!: FormGroup;
+  isLoading = false;
+  errorMessage = '';
   
   // Country codes options
   countryCodes: DropdownOption[] = [
@@ -133,7 +143,11 @@ export class SignUpComponent implements OnInit {
     { label: 'سوداني', value: 'sudanese' }
   ];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -143,23 +157,31 @@ export class SignUpComponent implements OnInit {
     this.registrationForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       countryCode: ['+20', [Validators.required]], // Default to Egypt
-      phoneNumber: ['', [Validators.required, this.phoneNumberValidator.bind(this)]],
+      phoneNumber: ['', [Validators.required, this.phoneNumberValidator('countryCode')]],
       fatherCountryCode: ['+20', [Validators.required]],
-      fatherPhoneNumber: ['', [Validators.required, this.phoneNumberValidator.bind(this)]],
+      fatherPhoneNumber: ['', [Validators.required, this.phoneNumberValidator('fatherCountryCode')]],
       motherCountryCode: ['+20', [Validators.required]],
-      motherPhoneNumber: ['', [Validators.required, this.phoneNumberValidator.bind(this)]],
+      motherPhoneNumber: ['', [Validators.required, this.phoneNumberValidator('motherCountryCode')]],
       schoolName: ['', [Validators.required]],
       jobTitle: ['', [Validators.required]],
       governorate: ['', [Validators.required]],
+      dateOfBirth: ['', [Validators.required]],
+      address: ['', [Validators.required]],
       studyYear: ['', [Validators.required]],
       gender: ['', [Validators.required]],
       sector: ['', [Validators.required]],
       nationality: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+          ),
+        ],
+      ],
       confirmPassword: ['', [Validators.required]],
-      profileImage: [null],
-      idImage: [null]
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -176,15 +198,11 @@ export class SignUpComponent implements OnInit {
   }
 
   // Dynamic phone number validator based on country code
-  phoneNumberValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) {
-      return null;
-    }
+  phoneNumberValidator(countryCodeField: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      const countryCode = control.parent?.get(countryCodeField)?.value || '+20';
 
-    const countryCode = this.registrationForm?.get('countryCode')?.value || 
-                       this.registrationForm?.get('fatherCountryCode')?.value || 
-                       this.registrationForm?.get('motherCountryCode')?.value;
-    
     // Phone number patterns for different countries
     const phonePatterns: { [key: string]: RegExp } = {
       '+20': /^1[0-9]{9}$/, // Egypt: 10 digits starting with 1
@@ -206,20 +224,33 @@ export class SignUpComponent implements OnInit {
       '+249': /^9[0-9]{8}$/ // Sudan: 9 digits starting with 9
     };
 
-    const pattern = phonePatterns[countryCode];
-    if (!pattern) {
-      return { invalidCountryCode: true };
-    }
-
-    return pattern.test(control.value) ? null : { invalidPhoneNumber: true };
+      const pattern = phonePatterns[countryCode];
+      if (!pattern) return { invalidCountryCode: true };
+      return pattern.test(control.value) ? null : { invalidPhoneNumber: true };
+    };
   }
 
   onSubmit(): void {
     if (this.registrationForm.valid) {
-      console.log('Form submitted:', this.registrationForm.value);
-      // Handle form submission here
+      this.isLoading = true;
+      this.errorMessage = '';
+      const registration = this.registrationForm.getRawValue() as UserRegistration;
+      this.auth.register(registration).subscribe({
+        next: response => {
+          this.isLoading = false;
+          if (response.success) {
+            void this.router.navigate(['/auth/sign-up-status']);
+          } else {
+            this.errorMessage = response.message;
+          }
+        },
+        error: error => {
+          this.isLoading = false;
+          this.errorMessage =
+            error.error?.message || 'تعذر إنشاء الحساب. راجع البيانات وحاول مرة أخرى';
+        },
+      });
     } else {
-      console.log('Form is invalid');
       this.markAllFieldsAsTouched();
     }
   }
@@ -228,15 +259,6 @@ export class SignUpComponent implements OnInit {
     Object.keys(this.registrationForm.controls).forEach(key => {
       this.registrationForm.get(key)?.markAsTouched();
     });
-  }
-
-  onFileSelect(event: any, fieldName: string): void {
-    const file = event.files[0];
-    if (file) {
-      this.registrationForm.patchValue({
-        [fieldName]: file
-      });
-    }
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -251,6 +273,9 @@ export class SignUpComponent implements OnInit {
       if (field.errors['required']) return 'هذا الحقل مطلوب';
       if (field.errors['email']) return 'البريد الإلكتروني غير صحيح';
       if (field.errors['minlength']) return 'الحد الأدنى للأحرف غير مستوفى';
+      if (field.errors['pattern']) {
+        return 'يجب أن تحتوي كلمة المرور على حرف كبير وصغير ورقم ورمز خاص';
+      }
       if (field.errors['invalidPhoneNumber']) return 'رقم الهاتف غير صحيح';
       if (field.errors['invalidCountryCode']) return 'كود الدولة غير صحيح';
     }

@@ -1,1 +1,78 @@
-<p>student-forum works!</p>
+<section class="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900">منتدى الكورس</h1>
+        <p class="text-slate-500">المناقشات متاحة للطلاب المسجلين ومعلم الكورس.</p>
+      </div>
+      <select class="border rounded-lg p-3 bg-white" [(ngModel)]="courseId" (change)="loadTopics(1)">
+        <option *ngFor="let course of courses" [ngValue]="course.id">{{ course.title }}</option>
+      </select>
+    </div>
+
+    <p *ngIf="error" class="bg-red-50 text-red-700 p-3 rounded-lg mb-4">{{ error }}</p>
+    <p *ngIf="!courses.length && !error" class="bg-white p-8 rounded-xl text-center text-slate-500">
+      سجّل في كورس لاستخدام المنتدى.
+    </p>
+
+    <div *ngIf="courseId" class="grid lg:grid-cols-[1fr_1.4fr] gap-6">
+      <div>
+        <form class="bg-white border rounded-xl p-5 mb-5" (ngSubmit)="createTopic()">
+          <h2 class="font-bold text-lg mb-3">موضوع جديد</h2>
+          <input class="field" name="title" [(ngModel)]="title" maxlength="180" placeholder="عنوان الموضوع">
+          <textarea class="field mt-3 min-h-28" name="content" [(ngModel)]="content" placeholder="اكتب سؤالك أو نقاشك"></textarea>
+          <button class="btn mt-3" [disabled]="!title.trim() || !content.trim()">نشر</button>
+        </form>
+
+        <div class="space-y-3">
+          <button *ngFor="let topic of topics" class="topic text-right" (click)="open(topic)">
+            <div class="flex justify-between gap-3">
+              <strong>{{ topic.title }}</strong>
+              <span class="text-xs text-slate-400">{{ topic.repliesCount }} رد</span>
+            </div>
+            <p class="text-sm text-slate-600 line-clamp-2 my-2">{{ topic.content }}</p>
+            <span class="text-xs text-slate-400">{{ topic.author.name }} · {{ topic.createdAt | date:'short' }}</span>
+          </button>
+          <button *ngIf="page > 1" class="link" (click)="loadTopics(page - 1)">السابق</button>
+          <button *ngIf="page * 10 < totalRecords" class="link float-left" (click)="loadTopics(page + 1)">التالي</button>
+        </div>
+      </div>
+
+      <article *ngIf="selected; else chooseTopic" class="bg-white border rounded-xl p-6 h-fit">
+        <div class="flex justify-between gap-3">
+          <h2 class="text-2xl font-bold">{{ selected.title }}</h2>
+          <div class="flex gap-2 text-sm">
+            <button *ngIf="selected.canEdit" class="text-blue-700" (click)="editTopic(selected)">تعديل</button>
+            <button *ngIf="selected.canEdit" class="text-red-700" (click)="removeTopic(selected)">حذف</button>
+            <button class="text-amber-700" (click)="report('topic', selected.id)">إبلاغ</button>
+          </div>
+        </div>
+        <p class="text-sm text-slate-500 my-2">{{ selected.author.name }} · {{ selected.createdAt | date:'medium' }}</p>
+        <p class="whitespace-pre-wrap text-slate-700 border-b pb-5">{{ selected.content }}</p>
+
+        <div class="space-y-3 my-5">
+          <div *ngFor="let item of selected.replies" class="bg-slate-50 rounded-lg p-4">
+            <div class="flex justify-between gap-3 text-sm">
+              <strong>{{ item.author.name }}</strong>
+              <span class="text-slate-400">{{ item.createdAt | date:'short' }}</span>
+            </div>
+            <p class="my-2 whitespace-pre-wrap">{{ item.content }}</p>
+            <div class="flex gap-3 text-xs">
+              <button *ngIf="item.canEdit" class="text-blue-700" (click)="editReply(item)">تعديل</button>
+              <button *ngIf="item.canEdit" class="text-red-700" (click)="removeReply(item)">حذف</button>
+              <button class="text-amber-700" (click)="report('reply', item.id)">إبلاغ</button>
+            </div>
+          </div>
+        </div>
+
+        <form (ngSubmit)="addReply()">
+          <textarea class="field min-h-24" name="reply" [(ngModel)]="reply" placeholder="اكتب رداً"></textarea>
+          <button class="btn mt-3" [disabled]="!reply.trim() || selected.state !== 'active'">إرسال الرد</button>
+        </form>
+      </article>
+      <ng-template #chooseTopic>
+        <div class="bg-white border rounded-xl p-10 h-fit text-center text-slate-500">اختر موضوعاً لعرض النقاش.</div>
+      </ng-template>
+    </div>
+  </div>
+</section>

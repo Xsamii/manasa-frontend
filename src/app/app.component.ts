@@ -15,7 +15,8 @@ export class AppComponent {
   constructor(private primengConfig: PrimeNGConfig) {}
 
   ngOnInit() {
-    // Configure PrimeNG for RTL
+    const stored = localStorage.getItem('theme');
+    document.documentElement.classList.toggle('dark', stored === 'dark');
     this.primengConfig.ripple = true;
     this.primengConfig.setTranslation({
       accept: 'موافق',

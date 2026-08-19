@@ -3,13 +3,14 @@ import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
 import { TableColumn, TableComponent } from '../../shared/components/table/table.component';
+import { WalletService } from '../../shared/services/wallet.service';
 
 interface Subscription {
   id: string;
   courseName: string;
-  price: number;
-  subscriptionType: 'إشتراكاتي' | 'يدوي';
-  invoiceNumber: number;
+  price: string;
+  subscriptionType: string;
+  invoiceNumber: string;
 }
 
 @Component({
@@ -32,6 +33,7 @@ export class SubscriptionsComponent implements OnInit {
 
   isLoadingSubscriptions = false;
   totalRecords = 0;
+  errorMessage = '';
 
   tableColumns: TableColumn[] = [
     { field: 'id', header: 'التسلسل', width: '100px' },
@@ -60,91 +62,35 @@ export class SubscriptionsComponent implements OnInit {
     }
   ];
 
-  subscriptions: Subscription[] = [
-    {
-      id: '12323',
-      courseName: 'دبلوم الوادي',
-      price: 100,
-      subscriptionType: 'إشتراكاتي',
-      invoiceNumber: 190
-    },
-    {
-      id: '3434',
-      courseName: 'دبلوم الوادي',
-      price: 150,
-      subscriptionType: 'يدوي',
-      invoiceNumber: 190
-    },
-    {
-      id: '656456',
-      courseName: 'دبلوم الوادي',
-      price: 80,
-      subscriptionType: 'إشتراكاتي',
-      invoiceNumber: 180
-    },
-    {
-      id: '12323',
-      courseName: 'دبلوم الوادي',
-      price: 150,
-      subscriptionType: 'إشتراكاتي',
-      invoiceNumber: 190
-    },
-    {
-      id: '3434',
-      courseName: 'دبلوم الوادي',
-      price: 80,
-      subscriptionType: 'إشتراكاتي',
-      invoiceNumber: 190
-    },
-    {
-      id: '656456',
-      courseName: 'دبلوم الوادي',
-      price: 150,
-      subscriptionType: 'إشتراكاتي',
-      invoiceNumber: 190
-    },
-    {
-      id: '12323',
-      courseName: 'دبلوم الوادي',
-      price: 80,
-      subscriptionType: 'إشتراكاتي',
-      invoiceNumber: 190
-    },
-    {
-      id: '656456',
-      courseName: 'دبلوم الوادي',
-      price: 150,
-      subscriptionType: 'يدوي',
-      invoiceNumber: 180
-    },
-    {
-      id: '3434',
-      courseName: 'دبلوم الوادي',
-      price: 150,
-      subscriptionType: 'يدوي',
-      invoiceNumber: 180
-    },
-    {
-      id: '656456',
-      courseName: 'دبلوم الوادي',
-      price: 80,
-      subscriptionType: 'يدوي',
-      invoiceNumber: 190
-    }
-  ];
+  subscriptions: Subscription[] = [];
+
+  constructor(private wallet: WalletService) {}
 
   ngOnInit(): void {
-    this.totalRecords = this.subscriptions.length;
     this.loadSubscriptions();
   }
 
   loadSubscriptions(): void {
     this.isLoadingSubscriptions = true;
     
-    // Simulate API call
-    setTimeout(() => {
-      this.isLoadingSubscriptions = false;
-    }, 1000);
+    this.errorMessage = '';
+    this.wallet.getSubscriptions().subscribe({
+      next: response => {
+        this.subscriptions = response.success ? response.data.map(item => ({
+          id: item.id,
+          courseName: item.title,
+          price: item.purchaseId ? 'مدفوع' : 'مجاني',
+          subscriptionType: item.status === 'active' ? 'نشط' : 'ملغي',
+          invoiceNumber: item.purchaseId ?? '—',
+        })) : [];
+        this.totalRecords = this.subscriptions.length;
+        this.isLoadingSubscriptions = false;
+      },
+      error: error => {
+        this.errorMessage = error.error?.message ?? 'تعذر تحميل الاشتراكات';
+        this.isLoadingSubscriptions = false;
+      },
+    });
   }
 
   viewSubscription(subscription: Subscription): void {
@@ -171,7 +117,7 @@ export class SubscriptionsComponent implements OnInit {
   canRenew(subscription: Subscription): boolean {
     // Add logic to determine if subscription can be renewed
     // For example, check if subscription is expired or about to expire
-    return Math.random() > 0.5; // Random for demo purposes
+    return false;
   }
 
   exportSubscriptions(): void {
@@ -215,7 +161,7 @@ export class SubscriptionsComponent implements OnInit {
         subscription.courseName,
         `${subscription.price} جم`,
         subscription.subscriptionType,
-        subscription.invoiceNumber.toString()
+        subscription.invoiceNumber
       ];
       csvRows.push(row.join(','));
     });

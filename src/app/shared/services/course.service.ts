@@ -1,60 +1,69 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Course, Lesson, CourseProgress } from '../models/course.model';
-import { ApiResponse, PaginatedData, LazyLoadEvent } from '../models/common.model';
+import {
+  Course,
+  CourseProgress,
+  EnrollmentResult,
+  Lesson,
+  LessonProgress,
+} from '../models/course.model';
+import { ApiResponse, PaginatedData } from '../models/common.model';
+import { apiUrl } from '../../core/config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService {
-  private readonly API_URL = '/api/courses';
+  private readonly API_URL = apiUrl('courses');
 
   constructor(private http: HttpClient) {}
 
-  // Get user's enrolled courses
-  getMyCourses(filters?: any): Observable<ApiResponse<Course[]>> {
-    return this.http.get<ApiResponse<Course[]>>(`${this.API_URL}/my-courses`, {
-      params: filters
-    });
+  getMyCourses(): Observable<ApiResponse<Course[]>> {
+    return this.http.get<ApiResponse<Course[]>>(`${this.API_URL}/my-courses`);
   }
 
-  // Get course details
-  getCourse(courseId: string): Observable<ApiResponse<Course>> {
+  getCourse(courseId: number): Observable<ApiResponse<Course>> {
     return this.http.get<ApiResponse<Course>>(`${this.API_URL}/${courseId}`);
   }
 
-  // Get course lessons
-  getCourseLessons(courseId: string): Observable<ApiResponse<Lesson[]>> {
-    return this.http.get<ApiResponse<Lesson[]>>(`${this.API_URL}/${courseId}/lessons`);
+  getCourseCurriculum(courseId: number): Observable<ApiResponse<Lesson[]>> {
+    return this.http.get<ApiResponse<Lesson[]>>(`${this.API_URL}/${courseId}/curriculum`);
   }
 
-  // Get course progress
-  getCourseProgress(courseId: string): Observable<ApiResponse<CourseProgress>> {
+  getCourseProgress(courseId: number): Observable<ApiResponse<CourseProgress>> {
     return this.http.get<ApiResponse<CourseProgress>>(`${this.API_URL}/${courseId}/progress`);
   }
 
-  // Update lesson progress
-  updateLessonProgress(courseId: string, lessonId: string, watchTime: number): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.API_URL}/${courseId}/lessons/${lessonId}/progress`, {
-      watchTime
+  updateLessonProgress(
+    courseId: number,
+    lessonId: number,
+    watchTimeSeconds: number,
+    positionSeconds: number,
+  ): Observable<ApiResponse<LessonProgress>> {
+    return this.http.post<ApiResponse<LessonProgress>>(`${this.API_URL}/${courseId}/lessons/${lessonId}/progress`, {
+      watchTimeSeconds,
+      positionSeconds,
     });
   }
 
-  // Mark lesson as completed
-  markLessonCompleted(courseId: string, lessonId: string): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.API_URL}/${courseId}/lessons/${lessonId}/complete`, {});
+  markLessonCompleted(courseId: number, lessonId: number): Observable<ApiResponse<LessonProgress>> {
+    return this.http.post<ApiResponse<LessonProgress>>(`${this.API_URL}/${courseId}/lessons/${lessonId}/complete`, {});
   }
 
-  // Get available courses for enrollment
-  getAvailableCourses(filters?: any): Observable<ApiResponse<PaginatedData<Course>>> {
+  getAvailableCourses(page = 1, pageSize = 12): Observable<ApiResponse<PaginatedData<Course>>> {
     return this.http.get<ApiResponse<PaginatedData<Course>>>(`${this.API_URL}/available`, {
-      params: filters
+      params: { page, pageSize }
     });
   }
 
-  // Enroll in a course
-  enrollInCourse(courseId: string): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.API_URL}/${courseId}/enroll`, {});
+  enrollInCourse(courseId: number): Observable<ApiResponse<EnrollmentResult>> {
+    const idempotencyKey = globalThis.crypto?.randomUUID?.() ??
+      `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return this.http.post<ApiResponse<EnrollmentResult>>(
+      `${this.API_URL}/${courseId}/enroll`,
+      {},
+      { headers: { 'x-idempotency-key': idempotencyKey } },
+    );
   }
 }

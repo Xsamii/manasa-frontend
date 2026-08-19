@@ -13,13 +13,6 @@ export const routes: Routes = [
     loadChildren: () => import('./main/main.routes').then(m => m.mainRoutes)
   },
   
-  // Redirect root to sign-up for now
-  {
-    path: '',
-    redirectTo: '/auth/sign-up',
-    pathMatch: 'full'
-  },
-  
   // Wildcard route - 404 page
   {
     path: '**',

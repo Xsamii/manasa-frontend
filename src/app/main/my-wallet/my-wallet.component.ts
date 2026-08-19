@@ -6,12 +6,14 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
 import { TableColumn, TableComponent } from '../../shared/components/table/table.component';
+import { WalletService } from '../../shared/services/wallet.service';
 
 interface WalletTransaction {
   id: string;
   amount: string;
   status: 'تم الدفع' | 'لم يتم الدفع' | 'قيد المراجعة';
   date: Date;
+  description?: string;
 }
 
 @Component({
@@ -39,6 +41,9 @@ export class MyWalletComponent implements OnInit {
   isCharging = false;
   isLoadingTransactions = false;
   totalRecords = 0;
+  balance = 0;
+  currency = 'EGP';
+  errorMessage = '';
 
   tableColumns: TableColumn[] = [
     { field: 'id', header: 'التسلسل', width: '100px' },
@@ -61,74 +66,13 @@ export class MyWalletComponent implements OnInit {
     }
   ];
 
-  transactions: WalletTransaction[] = [
-    {
-      id: '12323',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '3434',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '656456',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '12323',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '3434',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '656456',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '12323',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '3434',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '656456',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    },
-    {
-      id: '3434',
-      amount: '150 جم',
-      status: 'لم يتم الدفع',
-      date: new Date('2025-11-05')
-    }
-  ];
+  transactions: WalletTransaction[] = [];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private wallet: WalletService) {}
 
   ngOnInit(): void {
     this.initializeForm();
-    this.totalRecords = this.transactions.length;
+    this.loadWallet();
   }
 
   private initializeForm(): void {
@@ -143,31 +87,40 @@ export class MyWalletComponent implements OnInit {
   }
 
   onCharge(): void {
-    if (this.chargeForm.valid) {
-      this.isCharging = true;
-      const amount = this.chargeForm.value.amount;
-      
-      // Simulate API call
-      setTimeout(() => {
-        this.isCharging = false;
-        console.log('Charging wallet with amount:', amount);
-        
-        // Add new transaction to the list
-        const newTransaction: WalletTransaction = {
-          id: Math.random().toString().substr(2, 5),
-          amount: `${amount} جم`,
-          status: 'قيد المراجعة',
-          date: new Date()
-        };
-        
-        this.transactions.unshift(newTransaction);
-        this.totalRecords = this.transactions.length;
-        this.chargeForm.reset();
-        
-        // Show success message (you can implement toast notification here)
-        alert('تم إرسال طلب الشحن بنجاح');
-      }, 2000);
-    }
+    this.errorMessage = 'الشحن المباشر غير متاح. استخدم كود شحن موثوق.';
+  }
+
+  loadWallet(): void {
+    this.isLoadingTransactions = true;
+    this.errorMessage = '';
+    this.wallet.getBalance().subscribe({
+      next: response => {
+        if (response.success) {
+          this.balance = response.data.balance;
+          this.currency = response.data.currency;
+        }
+      },
+      error: error => this.errorMessage = error.error?.message ?? 'تعذر تحميل الرصيد',
+    });
+    this.wallet.getTransactions().subscribe({
+      next: response => {
+        if (response.success) {
+          this.transactions = response.data.items.map(item => ({
+            id: item.id,
+            amount: `${item.amount} ${item.currency}`,
+            status: 'تم الدفع',
+            date: new Date(item.createdAt),
+            description: item.description,
+          }));
+          this.totalRecords = response.data.totalRecords;
+        }
+        this.isLoadingTransactions = false;
+      },
+      error: error => {
+        this.errorMessage = error.error?.message ?? 'تعذر تحميل العمليات';
+        this.isLoadingTransactions = false;
+      },
+    });
   }
 
   isFieldInvalid(fieldName: string): boolean {

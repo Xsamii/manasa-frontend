@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SignUpStatusComponent } from './sign-up-status.component';
+import { provideRouter } from '@angular/router';
 
 describe('SignUpStatusComponent', () => {
   let component: SignUpStatusComponent;
@@ -8,7 +9,8 @@ describe('SignUpStatusComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SignUpStatusComponent]
+      imports: [SignUpStatusComponent],
+      providers: [provideRouter([])],
     })
     .compileComponents();
 

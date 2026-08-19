@@ -1,1 +1,96 @@
-<p>courses-content works!</p>
+<div class="workspace" dir="rtl">
+  <app-breadcrumb
+    [items]="[
+      { label: 'الكورسات', routerLink: '/courses' },
+      { label: course?.title || 'محتوى الكورس', isActive: true }
+    ]"
+    [pageTitle]="course?.title || 'محتوى الكورس'">
+  </app-breadcrumb>
+
+  <div *ngIf="isLoading" class="state-card">جار تحميل مساحة التعلّم...</div>
+  <div *ngIf="errorMessage" class="state-card error" role="alert">
+    <p>{{ errorMessage }}</p>
+    <button (click)="loadWorkspace()">إعادة المحاولة</button>
+  </div>
+
+  <div *ngIf="!isLoading && course && !errorMessage" class="workspace-grid">
+    <aside class="curriculum">
+      <div class="curriculum-header">
+        <h2>محتوى الكورس</h2>
+        <span>{{ progress?.progressPercentage || 0 }}%</span>
+      </div>
+      <div class="progress-track">
+        <div [style.width.%]="progress?.progressPercentage || 0"></div>
+      </div>
+
+      <button
+        *ngFor="let lesson of lessons"
+        class="lesson-item"
+        [class.active]="activeLesson?.id === lesson.id"
+        [class.completed]="lesson.completed"
+        (click)="selectLesson(lesson)">
+        <span class="lesson-order">{{ lesson.completed ? '✓' : lesson.order }}</span>
+        <span>
+          <strong>{{ lesson.title }}</strong>
+          <small>{{ lesson.videoUrl ? 'فيديو' : 'محتوى مقروء' }}</small>
+        </span>
+      </button>
+
+      <p *ngIf="lessons.length === 0" class="empty-lessons">
+        لم تتم إضافة دروس إلى هذا الكورس بعد.
+      </p>
+    </aside>
+
+    <main class="lesson-view" *ngIf="activeLesson; else noLesson">
+      <div class="video-shell" *ngIf="activeLesson.videoUrl; else noVideo">
+        <video
+          #courseVideo
+          controls
+          preload="metadata"
+          [src]="activeLesson.videoUrl"
+          (loadedmetadata)="onVideoLoaded(courseVideo)"
+          (timeupdate)="onTimeUpdate(courseVideo)"
+          (pause)="persistCurrentPosition()"
+          (ended)="completeActiveLesson()">
+          متصفحك لا يدعم تشغيل الفيديو.
+        </video>
+      </div>
+      <ng-template #noVideo>
+        <div class="no-video">
+          <i class="pi pi-file"></i>
+          <span>لا يوجد فيديو مرفق بهذا الدرس.</span>
+        </div>
+      </ng-template>
+
+      <section class="lesson-copy">
+        <span class="eyebrow">الدرس {{ activeLesson.order }}</span>
+        <h1>{{ activeLesson.title }}</h1>
+        <p>{{ activeLesson.description }}</p>
+        <div class="lesson-actions">
+          <button
+            class="complete-button"
+            [disabled]="activeLesson.completed"
+            (click)="completeActiveLesson()">
+            {{ activeLesson.completed ? 'تم إكمال الدرس' : 'تحديد كمكتمل' }}
+          </button>
+          <span *ngIf="isSaving">جار حفظ التقدم...</span>
+        </div>
+        <div *ngIf="activeLesson.resources.length" class="mt-6 border-t pt-5">
+          <h2 class="font-bold mb-3">تقييمات الدرس</h2>
+          <div class="flex flex-wrap gap-3">
+            <a *ngFor="let resource of activeLesson.resources"
+              [routerLink]="['/assessments', resource.type, resource.id]"
+              class="inline-flex items-center gap-2 border border-orange-300 rounded-lg px-4 py-2 text-orange-800">
+              <i [class]="resource.type === 'test' ? 'pi pi-check-square' : 'pi pi-file-edit'"></i>
+              {{ resource.title }}
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <ng-template #noLesson>
+      <main class="lesson-view state-card">اختر درساً للبدء.</main>
+    </ng-template>
+  </div>
+</div>

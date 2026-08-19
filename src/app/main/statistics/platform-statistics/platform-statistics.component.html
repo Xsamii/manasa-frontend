@@ -24,7 +24,7 @@
             </div>
             <div class="stats-info">
               <h3 class="stats-title">إجمالي مدة فتح المحاضرات علي الموقع</h3>
-              <p class="stats-value lecture-value">ساعتان</p>
+              <p class="stats-value lecture-value">{{ formatTime(statistics.totalLectureTime) }}</p>
             </div>
           </div>
         </div>
@@ -37,7 +37,7 @@
             </div>
             <div class="stats-info">
               <h3 class="stats-title">إجمالي عدد مرات مشاهدة الفيديوهات علي الموقع</h3>
-              <p class="stats-value video-value">34 مرة</p>
+              <p class="stats-value video-value">{{ formatCount(statistics.totalVideoWatches) }}</p>
             </div>
           </div>
         </div>
@@ -50,7 +50,7 @@
             </div>
             <div class="stats-info">
               <h3 class="stats-title">إجمالي عدد مرات فتح الاختبار</h3>
-              <p class="stats-value quiz-value">0 مرة</p>
+              <p class="stats-value quiz-value">{{ formatCount(statistics.totalQuizOpens) }}</p>
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@
             </div>
             <div class="stats-info">
               <h3 class="stats-title">إجمالي عدد مرات إنهاء الاختبارات</h3>
-              <p class="stats-value test-value">0 مرة</p>
+              <p class="stats-value test-value">{{ formatCount(statistics.totalQuizCompletions) }}</p>
             </div>
           </div>
         </div>
