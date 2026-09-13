@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { Upload as TusUpload } from 'tus-js-client';
 import {
   ContentType,
   RosterStudent,
@@ -74,7 +75,12 @@ import { PageIntroComponent } from '../shared/components/page-intro/page-intro.c
             </div>
             <div class="grid md:grid-cols-3 gap-3 my-4">
               <div *ngFor="let item of allContent(lesson)" class="border rounded-lg p-3">
-                <small>{{ label(item.type) }}</small><b class="block">{{ item.content.title }}</b>
+                <small>
+                  {{ label(item.type) }}
+                  <span *ngIf="item.type === 'video' && item.content.status === 'processing'" class="text-amber-600">(قيد المعالجة...)</span>
+                  <span *ngIf="item.type === 'video' && item.content.status === 'error'" class="text-red-600">(فشل الرفع)</span>
+                </small>
+                <b class="block">{{ item.content.title }}</b>
                 <button class="link" (click)="editContent(item.type, item.content)">تعديل</button>
                 <button class="danger" (click)="deleteContent(item.type, item.content)">حذف</button>
               </div>
@@ -82,10 +88,21 @@ import { PageIntroComponent } from '../shared/components/page-intro/page-intro.c
             <form [formGroup]="contentForm" (ngSubmit)="addContent(lesson)" class="bg-slate-50 rounded-lg p-3 grid md:grid-cols-2 gap-3">
               <select class="field" formControlName="type"><option value="video">فيديو</option><option value="homework">واجب</option><option value="test">اختبار</option></select>
               <input class="field" formControlName="title" placeholder="العنوان">
-              <input *ngIf="contentForm.controls.type.value === 'video'" class="field md:col-span-2" formControlName="url" placeholder="https://...">
-              <label *ngIf="contentForm.controls.type.value === 'video'" class="md:col-span-2 text-sm flex items-center gap-2">
-                <input type="checkbox" formControlName="isPreview"> فيديو معاينة مجاني 10–20 دقيقة
-              </label>
+              <ng-container *ngIf="contentForm.controls.type.value === 'video'">
+                <label class="md:col-span-2 text-sm flex items-center gap-2">
+                  <input type="checkbox" formControlName="isPreview"> فيديو معاينة مجاني 10–20 دقيقة
+                </label>
+                <input
+                  class="field md:col-span-2"
+                  type="file"
+                  accept="video/*"
+                  [disabled]="uploadingLessonId === lesson.id"
+                  (change)="startVideoUpload(lesson, $event)">
+                <div *ngIf="uploadingLessonId === lesson.id" class="md:col-span-2 text-sm space-y-1">
+                  <div class="upload-track"><div class="upload-fill" [style.width.%]="uploadProgress"></div></div>
+                  <span>{{ uploadStatusLabel }}</span>
+                </div>
+              </ng-container>
               <ng-container *ngIf="contentForm.controls.type.value !== 'video'">
                 <input class="field" type="number" min="1" formControlName="maxGrade" placeholder="الدرجة القصوى">
                 <input class="field" type="datetime-local" formControlName="dateOfDelivery">
@@ -93,8 +110,8 @@ import { PageIntroComponent } from '../shared/components/page-intro/page-intro.c
                 <textarea *ngIf="contentForm.controls.type.value === 'test'" class="field md:col-span-2" rows="6"
                   formControlName="questionsJson"
                   placeholder='الأسئلة بصيغة JSON: [{"prompt":"2+2؟","points":1,"options":[{"text":"4","isCorrect":true},{"text":"3","isCorrect":false}]}]'></textarea>
+                <button class="btn md:col-span-2">إضافة المحتوى</button>
               </ng-container>
-              <button class="btn md:col-span-2">إضافة المحتوى</button>
             </form>
             <div class="mt-3">
               <h4 class="font-semibold mb-2">ماتريال المحاضرة (PDF وغيره)</h4>
@@ -115,9 +132,11 @@ import { PageIntroComponent } from '../shared/components/page-intro/page-intro.c
     .field{border:1px solid #cbd5e1;border-radius:.6rem;padding:.65rem;width:100%}
     .btn,.secondary{border-radius:.6rem;padding:.7rem 1rem}.btn{background:#ea580c;color:#fff}.secondary{background:#e2e8f0}
     .link{color:#0369a1;padding:.35rem}.danger{color:#b91c1c;padding:.35rem}
+    .upload-track{background:#e2e8f0;border-radius:999px;height:.5rem;overflow:hidden}
+    .upload-fill{background:#ea580c;height:100%;transition:width .2s ease}
   `],
 })
-export class TeacherCourseEditorComponent implements OnInit {
+export class TeacherCourseEditorComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(TeacherAuthoringService);
@@ -146,8 +165,13 @@ export class TeacherCourseEditorComponent implements OnInit {
     isPreview: [false],
   });
   private readonly id = Number(this.route.snapshot.paramMap.get('id'));
+  uploadingLessonId: number | null = null;
+  uploadProgress = 0;
+  uploadStatusLabel = '';
+  private statusPollTimer?: ReturnType<typeof setTimeout>;
 
   ngOnInit(): void { this.load(); }
+  ngOnDestroy(): void { if (this.statusPollTimer) clearTimeout(this.statusPollTimer); }
   load(): void {
     forkJoin({ course: this.api.getCourse(this.id), roster: this.api.getRoster(this.id) }).subscribe({
       next: ({ course, roster }) => {
@@ -182,11 +206,12 @@ export class TeacherCourseEditorComponent implements OnInit {
   deleteSession(lesson: TeacherSession): void { if (confirm(`حذف "${lesson.title}" ومحتواه؟`)) this.api.deleteSession(lesson.id).subscribe({ next: () => this.load() }); }
   addContent(lesson: TeacherSession): void {
     const value = this.contentForm.getRawValue(); const type = value.type;
-    if (!value.title || (type === 'video' && !value.url)) {
-      this.error = 'العنوان ورابط الفيديو مطلوبان';
+    if (type === 'video') return; // videos are added via startVideoUpload on file selection
+    if (!value.title) {
+      this.error = 'العنوان مطلوب';
       return;
     }
-    if (type !== 'video' && (!value.dateOfDelivery || value.maxGrade < 1)) {
+    if (!value.dateOfDelivery || value.maxGrade < 1) {
       this.error = 'الدرجة وموعد التسليم مطلوبان';
       return;
     }
@@ -200,10 +225,82 @@ export class TeacherCourseEditorComponent implements OnInit {
         return;
       }
     }
-    const input = type === 'video'
-      ? { sessionId: lesson.id, title: value.title, url: value.url, position: this.contentCount(lesson), isPreview: value.isPreview, previewMaxSeconds: 900 }
-      : { sessionId: lesson.id, title: value.title, maxGrade: value.maxGrade, dateOfDelivery: new Date(value.dateOfDelivery).toISOString(), instructions: value.instructions, position: this.contentCount(lesson), ...(type === 'test' ? { questions } : {}) };
+    const input = { sessionId: lesson.id, title: value.title, maxGrade: value.maxGrade, dateOfDelivery: new Date(value.dateOfDelivery).toISOString(), instructions: value.instructions, position: this.contentCount(lesson), ...(type === 'test' ? { questions } : {}) };
     this.api.createContent(type, input).subscribe({ next: () => { this.contentForm.reset({ type: 'video', maxGrade: 10, isPreview: false }); this.load(); }, error: error => this.error = error.error?.message ?? 'راجع بيانات المحتوى' });
+  }
+  startVideoUpload(lesson: TeacherSession, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const value = this.contentForm.getRawValue();
+    const title = value.title || file.name;
+    const isPreview = value.isPreview;
+    this.error = '';
+    this.uploadingLessonId = lesson.id;
+    this.uploadProgress = 0;
+    this.uploadStatusLabel = 'جارٍ التحضير...';
+    this.api.createVideoUpload({
+      sessionId: lesson.id,
+      title,
+      isPreview,
+      previewMaxSeconds: isPreview ? 900 : undefined,
+      position: this.contentCount(lesson),
+    }).subscribe({
+      next: response => {
+        const body = response.data;
+        if (!body) { this.failUpload('تعذر بدء الرفع'); return; }
+        const { video, upload } = body;
+        this.uploadStatusLabel = 'جارٍ الرفع...';
+        const tusUpload = new TusUpload(file, {
+          endpoint: upload.endpoint,
+          headers: {
+            AuthorizationSignature: upload.signature,
+            AuthorizationExpire: String(upload.expire),
+            VideoId: upload.videoId,
+            LibraryId: upload.libraryId,
+          },
+          metadata: { filetype: file.type, title },
+          chunkSize: 50 * 1024 * 1024,
+          onError: uploadError => this.failUpload('تعذر رفع الفيديو: ' + uploadError.message),
+          onProgress: (bytesUploaded, bytesTotal) => {
+            this.uploadProgress = Math.round((bytesUploaded / bytesTotal) * 100);
+          },
+          onSuccess: () => {
+            this.uploadStatusLabel = 'جارٍ معالجة الفيديو...';
+            this.pollVideoStatus(video.id, lesson);
+          },
+        });
+        tusUpload.start();
+      },
+      error: uploadError => this.failUpload(uploadError.error?.message ?? 'تعذر بدء الرفع'),
+    });
+    input.value = '';
+  }
+  private pollVideoStatus(videoId: number, lesson: TeacherSession, attempt = 0): void {
+    if (attempt > 60) { this.finishUpload(); return; }
+    this.api.getVideoStatus(videoId).subscribe({
+      next: response => {
+        if (response.data?.status === 'processing') {
+          this.statusPollTimer = setTimeout(() => this.pollVideoStatus(videoId, lesson, attempt + 1), 5000);
+        } else {
+          this.finishUpload();
+        }
+      },
+      error: () => this.finishUpload(),
+    });
+  }
+  private finishUpload(): void {
+    this.uploadingLessonId = null;
+    this.uploadProgress = 0;
+    this.uploadStatusLabel = '';
+    this.contentForm.reset({ type: 'video', maxGrade: 10, isPreview: false });
+    this.load();
+  }
+  private failUpload(message: string): void {
+    this.error = message;
+    this.uploadingLessonId = null;
+    this.uploadProgress = 0;
+    this.uploadStatusLabel = '';
   }
   uploadMaterial(lesson: TeacherSession, event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
@@ -216,8 +313,7 @@ export class TeacherCourseEditorComponent implements OnInit {
   editContent(type: ContentType, item: TeacherContent): void {
     const title = prompt('العنوان', item.title); if (!title) return;
     const input: Partial<TeacherContent> = { title };
-    if (type === 'video') { const url = prompt('رابط الفيديو (HTTP/HTTPS)', item.url); if (!url) return; input.url = url; }
-    else {
+    if (type !== 'video') {
       const maxGrade = Number(prompt('الدرجة القصوى', String(item.maxGrade ?? 10)));
       if (!Number.isFinite(maxGrade) || maxGrade < 1) return;
       input.maxGrade = maxGrade;

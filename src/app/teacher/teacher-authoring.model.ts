@@ -8,6 +8,7 @@ export interface TeacherContent {
   position: number;
   url?: string;
   provider?: string;
+  status?: string;
   maxGrade?: number;
   dateOfDelivery?: string;
   instructions?: string | null;

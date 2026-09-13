@@ -83,6 +83,38 @@ export class TeacherAuthoringService {
     );
   }
 
+  createVideoUpload(input: {
+    sessionId: number;
+    title: string;
+    position?: number;
+    isPreview?: boolean;
+    previewMaxSeconds?: number;
+  }): Observable<ApiResponse<{
+    video: TeacherContent;
+    upload: {
+      endpoint: string;
+      libraryId: string;
+      videoId: string;
+      expire: number;
+      signature: string;
+    };
+  }>> {
+    return this.http.post<ApiResponse<{
+      video: TeacherContent;
+      upload: {
+        endpoint: string;
+        libraryId: string;
+        videoId: string;
+        expire: number;
+        signature: string;
+      };
+    }>>(apiUrl('videos/uploads'), input);
+  }
+
+  getVideoStatus(id: number): Observable<ApiResponse<TeacherContent>> {
+    return this.http.get<ApiResponse<TeacherContent>>(apiUrl(`videos/${id}/status`));
+  }
+
   addMaterial(sessionId: number, file: File, title: string) {
     const form = new FormData();
     form.append('file', file);
