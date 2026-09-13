@@ -50,8 +50,13 @@ export class AuthService {
     return !!this.currentUser;
   }
 
-  register(userData: UserRegistration): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(this.STUDENTS_URL, userData);
+  register(userData: UserRegistration, identityDocument: File): Observable<ApiResponse<any>> {
+    const form = new FormData();
+    Object.entries(userData).forEach(([key, value]) => {
+      form.append(key, value == null ? '' : String(value));
+    });
+    form.append('identityDocument', identityDocument);
+    return this.http.post<ApiResponse<any>>(this.STUDENTS_URL, form);
   }
 
   signIn(
@@ -89,6 +94,46 @@ export class AuthService {
 
   expireSession(): void {
     this.clearSession();
+  }
+
+  getProfile(): Observable<ApiResponse<{ user: User }>> {
+    return this.http.get<ApiResponse<{ user: User }>>(`${this.API_URL}/me`).pipe(
+      tap(response => {
+        if (response.success) {
+          this.storeUser(response.data.user);
+        }
+      }),
+    );
+  }
+
+  updateProfile(input: Partial<User>): Observable<ApiResponse<{ user: User }>> {
+    return this.http
+      .patch<ApiResponse<{ user: User }>>(`${this.API_URL}/profile`, input)
+      .pipe(
+        tap(response => {
+          if (response.success) {
+            this.storeUser(response.data.user);
+          }
+        }),
+      );
+  }
+
+  changePassword(input: {
+    currentPassword: string;
+    password: string;
+    confirmPassword: string;
+  }): Observable<ApiResponse<{ passwordChanged: boolean }>> {
+    return this.http.post<ApiResponse<{ passwordChanged: boolean }>>(
+      `${this.API_URL}/password`,
+      input,
+    );
+  }
+
+  logoutOthers(): Observable<ApiResponse<{ loggedOutOthers: boolean }>> {
+    return this.http.post<ApiResponse<{ loggedOutOthers: boolean }>>(
+      `${this.API_URL}/logout-others`,
+      {},
+    );
   }
 
   getActiveSessions(): Observable<ApiResponse<DeviceSession[]>> {
@@ -149,6 +194,10 @@ export class AuthService {
 
   private storeSession(sessionId: string, user: User): void {
     localStorage.setItem(SESSION_ID_STORAGE_KEY, sessionId);
+    this.storeUser(user);
+  }
+
+  private storeUser(user: User): void {
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
     this.currentUserSubject.next(user);
   }

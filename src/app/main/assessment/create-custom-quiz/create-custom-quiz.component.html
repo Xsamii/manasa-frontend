@@ -1,6 +1,9 @@
 <main class="max-w-5xl mx-auto p-6" dir="rtl">
   <h1 class="text-3xl font-bold">الاختبارات والتدريب</h1>
-  <p class="mt-2 text-slate-600">اختر اختباراً حقيقياً من الكورسات المسجل بها. تستخدم هذه الصفحة نموذج الاختبار الموحد ولا تنشئ أسئلة منفصلة غير متوافقة.</p>
+  <app-page-intro
+    class="block mt-4"
+    text="تظهر هنا اختبارات الكورسات التي اشتركت بها فقط. ابدأ الاختبار من الدرس أو من هذه القائمة، ثم تُحفظ المحاولة وتظهر النتيجة بعد التصحيح.">
+  </app-page-intro>
   <p *ngIf="loading" class="mt-8">جار تحميل الاختبارات...</p>
   <p *ngIf="error" class="mt-8 text-red-700">{{ error }}</p>
   <div class="grid md:grid-cols-2 gap-4 mt-6">

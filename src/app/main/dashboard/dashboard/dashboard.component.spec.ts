@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { DashboardComponent } from './dashboard.component';
 import { CourseService } from '../../../shared/services/course.service';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -15,9 +16,19 @@ describe('DashboardComponent', () => {
       providers: [
         provideRouter([]),
         {
+          provide: AuthService,
+          useValue: {
+            currentUser: { fullName: 'سارة علي', studyYear: '1st Secondary' },
+          },
+        },
+        {
           provide: CourseService,
           useValue: {
             getMyCourses: () => of({ success: true, data: [] }),
+            getAvailableCourses: () => of({
+              success: true,
+              data: { items: [], totalRecords: 0, page: 1, pageSize: 8 },
+            }),
           },
         },
         {

@@ -12,6 +12,13 @@ export interface Course {
   curriculumPreview?: LessonPreview[];
   price: number;
   currency: string;
+  previewVideo?: {
+    id: number;
+    title: string;
+    provider: string;
+    url: string | null;
+    previewMaxSeconds: number;
+  } | null;
 }
 
 export interface Instructor {
@@ -34,7 +41,24 @@ export interface Lesson {
   description: string;
   videoUrl: string | null;
   order: number;
-  videos: Array<{ id: number; title: string; url: string }>;
+  videos: Array<{
+    id: number;
+    title: string;
+    url: string | null;
+    provider: string;
+    status?: string;
+    isPreview?: boolean;
+    previewMaxSeconds?: number;
+  }>;
+  outline?: Array<{ kind: 'lesson' | 'homework_solution' | 'practice'; title: string }>;
+  materials?: Array<{
+    id: number;
+    title: string;
+    originalName: string;
+    mimeType: string;
+    size: number;
+    url: string;
+  }>;
   resources: Array<{ id: number; type: 'homework' | 'test'; title: string }>;
   completed: boolean;
   watchTimeSeconds: number;

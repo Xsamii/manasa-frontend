@@ -1,161 +1,84 @@
- <!-- Hero Section -->
-    <div class="bg-gray-200 relative overflow-hidden">
-      <!-- Background Image Layer with Curved Bottom -->
-      <div class="absolute inset-0 bg-teal-800">
-        <!-- You can add a background image here if needed -->
-        <!-- <img src="assets/images/hero-bg.jpg" class="w-full h-full object-cover" /> -->
-      </div>
-      
-      <!-- Curved Bottom SVG -->
-        <div class="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1200 80" preserveAspectRatio="none" class="w-full h-20 fill-gray-200">
-          <path d="M0,0 Q600,110 1200,0 L1200,80 L0,80 Z"></path>
-        </svg>
-      </div>
-      
-      <div class="max-w-7xl mx-auto px-6 py-20 relative z-10">
-        <div class="flex items-center justify-between">
-          
-          <!-- Right Video Container -->
-          <div class="flex-1 flex justify-center">
-            <div class="relative">
-              <!-- Orange Border Container (bigger) -->
-              <div class="bg-white p-1 rounded-3xl">
-                <!-- Video/Image Area (no white container) -->
-                <div class="relative w-96 h-60 bg-gray-200 rounded-3xl overflow-hidden">
-                  <img 
-                    src="assets/images/hero-students.svg" 
-                    alt="Students learning" 
-                    class="w-full h-full object-cover"
-                  />
-                  <!-- Play Button -->
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-20 h-20 bg-white border-[1px] border-white bg-opacity-20 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-105 transition-transform">
-                      <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M8 5v10l8-5-8-5z"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Left Content (positioned at half height of video) -->
-          <div class="flex-1 text-white" style="margin-top: 120px;">
-            <h1 class="text-4xl font-bold mb-4">تصميم تجربة المستخدم</h1>
-            <h2 class="text-3xl font-bold text-orange-400 mb-6">عملي و تفاعلي</h2>
-            <p class="text-lg leading-relaxed max-w-md">
-            تفهّم منصة تعلم مهارات تصميم تجربة المستخدم بشكل عملي تفاعلي علي يد خبراء ومحترفون لاكثر من ٢٠ عام في المجال.
-
-            </p>
-          </div>
-
-        </div>
-
-        <!-- Navigation Dots/Arrows -->
-        <div class="flex justify-center gap-4 mt-12 space-x-3">
-          <button class="w-10 h-10 bg-white border-[1px] border-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </button>
-          <button class="w-10 h-10 bg-white border-[1px] border-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-        </div>
-      </div>
+<div dir="rtl">
+  <div class="bg-teal-800 text-white relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 py-16">
+      <p class="text-orange-300 font-semibold mb-2">مرحبا بك يا {{ welcomeLabel }}</p>
+      <h1 class="text-3xl md:text-4xl font-bold mb-3">صفحتك بعد تسجيل الدخول</h1>
+      <p class="text-lg text-teal-50 max-w-2xl leading-relaxed">
+        من هنا تتابع كورساتك، معلميك، اشتراكاتك، ونتائجك.
+        <span *ngIf="studyYear">صفك الحالي: {{ studyYear }}.</span>
+        محتوى الدرس يظهر فقط في الكورسات التي اشتركت بها أو اشتريتها.
+      </p>
     </div>
+  </div>
 
-    <!-- Navigation Cards Section -->
-    <div class="bg-gray-50 pt-16 pb-44">
-      <div class=" mx-auto px-6">
-        <div class="grid grid-cols-4 gap-6 items-center">
-       
-          <!-- Forum -->
-          <div class="bg-[#FFF0F0] w-full rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
-          routerLink="/forum">
-          <h3 class="font-semibold text-gray-800">منتدى الكورسات</h3>
-            <div class="w-12 h-12">
-              <img src="assets/icons/subjects.svg" alt="">
-            </div>
-          </div>
-          
-          <!-- كورساتي (Courses) -->
-          <div class="bg-[#FFF2E5] rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
-               routerLink="/courses">
-               <h3 class="font-semibold text-gray-800">كورساتي</h3>
-            <div class="w-12 h-12">
-                 <img src="assets/icons/courses.svg" alt="">
-            </div>
-          </div>
-           
-          <!-- إشتراكاتي (Subscriptions) -->
-          <div class="bg-[#E1F7E3] rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
-               routerLink="/subscriptions">
-               <h3 class="font-semibold text-gray-800">إشتراكاتي</h3>
-            <div class="w-12 h-12 ">
-              <img src="assets/icons/subscriptions.svg" alt="">
-            </div>
-          </div>
-            
-          <!-- Statistics -->
-          <div class="bg-[#EBEBFF] rounded-2xl flex justify-between items-center px-8 py-4 text-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
-               routerLink="/statistics/platform">
-               <h3 class="font-semibold text-gray-800">إحصائياتي</h3>
-            <div class="w-12 h-12 ">
-              <img src="assets/icons/competition.svg" alt="">
-            </div>
-          </div>
-        </div>
+  <div class="bg-gray-50 pt-10 pb-20">
+    <div class="max-w-7xl mx-auto px-6">
+      <app-page-intro
+        kicker="كيف تعمل المنصة"
+        text="الصفحة الرئيسية تجمع أهم اختصارات الطالب. الكتالوج يعرض اسم الكورس والمعلم والسعر. الفيديو والواجبات والاختبارات تُفتح بعد الاشتراك."
+        [points]="[
+          'كورساتي: تابع ما سجلت فيه وأكمل الدروس.',
+          'الاشتراكات والمحفظة: اشحن رصيدك ثم اشتر الكورس.',
+          'الإحصائيات والمنتدى: راقب تقدمك واسأل معلمك داخل الكورس.'
+        ]">
+      </app-page-intro>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
+        <a class="shortcut shortcut-forum" routerLink="/forum">
+          <span>منتدى الكورسات</span>
+          <small>أسئلة داخل الكورس المسجّل فقط</small>
+        </a>
+        <a class="shortcut shortcut-courses" routerLink="/courses">
+          <span>الكورسات</span>
+          <small>كتالوج صفك ثم محتوى بعد الشراء</small>
+        </a>
+        <a class="shortcut shortcut-subs" routerLink="/subscriptions">
+          <span>اشتراكاتي</span>
+          <small>الكورسات التي فتحت محتواها</small>
+        </a>
+        <a class="shortcut shortcut-stats" routerLink="/statistics/platform">
+          <span>إحصائياتي</span>
+          <small>وقت المشاهدة والتقدم</small>
+        </a>
       </div>
 
-      <section class="mx-auto px-6 mt-10" dir="rtl">
-        <div class="bg-white rounded-xl p-5 shadow-sm">
-          <h2 class="text-xl font-bold mb-1">آخر الإشعارات</h2>
-          <p class="text-sm text-slate-500 mb-4">{{ unreadNotifications }} غير مقروء</p>
-          <button
-            *ngFor="let item of recentNotifications"
-            class="block w-full text-right border-t p-3 hover:bg-slate-50"
-            [class.font-semibold]="!item.readAt"
-            (click)="openNotification(item)"
-          >
-            <span class="block">{{ item.title }}</span>
-            <small class="text-slate-500">{{ item.message }}</small>
-          </button>
-          <p *ngIf="!recentNotifications.length" class="text-slate-500 text-center py-4">لا توجد إشعارات.</p>
+      <section class="mb-12">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800">معلومك</h2>
+            <p class="text-gray-500">المعلمون الظاهرون من كورساتك والكورسات المتاحة لصفك.</p>
+          </div>
         </div>
+        <div *ngIf="!isLoadingCourses && teachers.length" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <article *ngFor="let teacher of teachers" class="bg-white rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-gray-800">{{ teacher.name }}</h3>
+            <p class="text-sm text-teal-700 mt-1">{{ teacher.title || 'معلم المنصة' }}</p>
+          </article>
+        </div>
+        <p *ngIf="!isLoadingCourses && !teachers.length" class="bg-white rounded-xl p-6 text-gray-500">
+          سيظهر المعلمون هنا عند توفر كورسات منشورة لصفك.
+        </p>
       </section>
 
-      <section class="mx-auto px-6 mt-12" dir="rtl">
-        <div class="flex justify-between items-center mb-5">
+      <section class="mb-12">
+        <div class="flex justify-between items-center mb-4">
           <div>
             <h2 class="text-2xl font-bold text-gray-800">تابع تعلّمك</h2>
-            <p class="text-gray-500">
-              {{ enrolledCourses }} كورس · {{ completedLessons }} درس مكتمل
-            </p>
+            <p class="text-gray-500">{{ enrolledCourses }} كورس مسجّل · {{ completedLessons }} درس مكتمل</p>
           </div>
-          <a routerLink="/courses" class="text-orange-600 font-semibold">عرض كل الكورسات</a>
+          <a routerLink="/courses" class="text-orange-600 font-semibold">كل الكورسات</a>
         </div>
-
-        <div *ngIf="isLoadingCourses" class="bg-white rounded-xl p-8 text-center">
-          جار تحميل كورساتك...
-        </div>
+        <div *ngIf="isLoadingCourses" class="bg-white rounded-xl p-8 text-center">جار تحميل كورساتك...</div>
         <div *ngIf="coursesError" class="bg-red-50 text-red-700 rounded-xl p-6 text-center">
           <p>{{ coursesError }}</p>
-          <button (click)="loadCourses()" class="mt-3 px-5 py-2 bg-teal-700 text-white rounded-lg">
-            إعادة المحاولة
-          </button>
+          <button (click)="loadCourses()" class="mt-3 px-5 py-2 bg-teal-700 text-white rounded-lg">إعادة المحاولة</button>
         </div>
         <div *ngIf="!isLoadingCourses && !coursesError && recentCourses.length === 0"
              class="bg-white rounded-xl p-8 text-center text-gray-500">
-          لم تسجل في أي كورس بعد.
+          لم تشترك في أي كورس بعد. استعرض الكتالوج واشتر أو سجّل مجاناً لفتح الدروس.
           <a routerLink="/courses" class="block mt-3 text-orange-600">استعرض الكورسات المتاحة</a>
         </div>
-
-        <div *ngIf="!isLoadingCourses && recentCourses.length" class="grid grid-cols-3 gap-5">
+        <div *ngIf="!isLoadingCourses && recentCourses.length" class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <a *ngFor="let course of recentCourses"
              [routerLink]="['/courses', course.id]"
              class="block bg-white rounded-xl p-5 shadow-sm hover:shadow-md">
@@ -168,4 +91,40 @@
           </a>
         </div>
       </section>
+
+      <section class="mb-12">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800">كورسات يمكنك الاشتراك بها</h2>
+            <p class="text-gray-500">معاينة عامة فقط. الدروس والفيديوهات تُقفل حتى الشراء أو التسجيل.</p>
+          </div>
+        </div>
+        <div *ngIf="!isLoadingCourses && catalogCourses.length" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <a *ngFor="let course of catalogCourses"
+             [routerLink]="['/courses', course.id]"
+             class="block bg-white rounded-xl p-5 shadow-sm hover:shadow-md">
+            <span class="text-xs text-orange-600">{{ course.studyYear | studyYear }}</span>
+            <h3 class="font-bold text-gray-800 my-2">{{ course.title }}</h3>
+            <p class="text-sm text-gray-500 mb-2">{{ course.instructor?.name }} · {{ course.lessonsCount }} درس</p>
+            <strong class="text-teal-800">{{ course.isEnrolled ? 'مشترك' : (course.price === 0 ? 'مجاني' : course.price + ' ' + course.currency) }}</strong>
+          </a>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-xl p-5 shadow-sm">
+        <h2 class="text-xl font-bold mb-1">آخر الإشعارات</h2>
+        <p class="text-sm text-slate-500 mb-4">{{ unreadNotifications }} غير مقروء · تنبيهات التصحيح والشراء والاشتراك</p>
+        <button
+          *ngFor="let item of recentNotifications"
+          class="block w-full text-right border-t p-3 hover:bg-slate-50"
+          [class.font-semibold]="!item.readAt"
+          (click)="openNotification(item)"
+        >
+          <span class="block">{{ item.title }}</span>
+          <small class="text-slate-500">{{ item.message }}</small>
+        </button>
+        <p *ngIf="!recentNotifications.length" class="text-slate-500 text-center py-4">لا توجد إشعارات.</p>
+      </section>
     </div>
+  </div>
+</div>

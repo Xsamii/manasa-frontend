@@ -18,8 +18,9 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
 import { AuthService } from '../../shared/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { UserRegistration } from '../../shared/models/user.model';
+import { STUDY_YEAR_OPTIONS } from '../../shared/models/study-year';
 
 interface DropdownOption {
   label: string;
@@ -38,6 +39,7 @@ interface DropdownOption {
     InputMaskModule,
     PasswordModule,
     MessageModule,
+    RouterModule,
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
@@ -102,12 +104,7 @@ export class SignUpComponent implements OnInit {
 
   studyYears: DropdownOption[] = [
     { label: 'اختر سنتك الدراسية', value: '' },
-    { label: 'السنة الأولى', value: 'year1' },
-    { label: 'السنة الثانية', value: 'year2' },
-    { label: 'السنة الثالثة', value: 'year3' },
-    { label: 'السنة الرابعة', value: 'year4' },
-    { label: 'السنة الخامسة', value: 'year5' },
-    { label: 'السنة السادسة', value: 'year6' }
+    ...STUDY_YEAR_OPTIONS,
   ];
 
   genders: DropdownOption[] = [
@@ -149,19 +146,60 @@ export class SignUpComponent implements OnInit {
     private router: Router,
   ) {}
 
+  identityFile: File | null = null;
+  identityFileName = '';
+
   ngOnInit(): void {
     this.initializeForm();
+    this.registrationForm.get('parentUnavailable')?.valueChanges.subscribe(value => {
+      this.applyParentAvailability(value || 'none');
+    });
+  }
+
+  private quadNameValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const parts = String(control.value || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    return parts.length >= 4 ? null : { quadName: true };
+  };
+
+  onIdentitySelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+    this.identityFile = file;
+    this.identityFileName = file?.name || '';
+  }
+
+  applyParentAvailability(value: 'none' | 'father' | 'mother'): void {
+    const father = this.registrationForm.get('fatherPhoneNumber');
+    const mother = this.registrationForm.get('motherPhoneNumber');
+    if (value === 'father') {
+      father?.reset('');
+      father?.clearValidators();
+      mother?.setValidators([Validators.required, this.phoneNumberValidator('motherCountryCode')]);
+    } else if (value === 'mother') {
+      mother?.reset('');
+      mother?.clearValidators();
+      father?.setValidators([Validators.required, this.phoneNumberValidator('fatherCountryCode')]);
+    } else {
+      father?.setValidators([Validators.required, this.phoneNumberValidator('fatherCountryCode')]);
+      mother?.setValidators([Validators.required, this.phoneNumberValidator('motherCountryCode')]);
+    }
+    father?.updateValueAndValidity();
+    mother?.updateValueAndValidity();
   }
 
   private initializeForm(): void {
     this.registrationForm = this.fb.group({
-      fullName: ['', [Validators.required, Validators.minLength(2)]],
+      fullName: ['', [Validators.required, this.quadNameValidator]],
       countryCode: ['+20', [Validators.required]], // Default to Egypt
       phoneNumber: ['', [Validators.required, this.phoneNumberValidator('countryCode')]],
       fatherCountryCode: ['+20', [Validators.required]],
       fatherPhoneNumber: ['', [Validators.required, this.phoneNumberValidator('fatherCountryCode')]],
       motherCountryCode: ['+20', [Validators.required]],
       motherPhoneNumber: ['', [Validators.required, this.phoneNumberValidator('motherCountryCode')]],
+      parentUnavailable: ['none' as const, [Validators.required]],
       schoolName: ['', [Validators.required]],
       jobTitle: ['', [Validators.required]],
       governorate: ['', [Validators.required]],
@@ -231,11 +269,17 @@ export class SignUpComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.registrationForm.valid) {
+    if (this.registrationForm.valid && this.identityFile) {
       this.isLoading = true;
       this.errorMessage = '';
       const registration = this.registrationForm.getRawValue() as UserRegistration;
-      this.auth.register(registration).subscribe({
+      if (registration.parentUnavailable === 'father') {
+        registration.fatherPhoneNumber = '';
+      }
+      if (registration.parentUnavailable === 'mother') {
+        registration.motherPhoneNumber = '';
+      }
+      this.auth.register(registration, this.identityFile).subscribe({
         next: response => {
           this.isLoading = false;
           if (response.success) {
@@ -251,6 +295,9 @@ export class SignUpComponent implements OnInit {
         },
       });
     } else {
+      if (!this.identityFile) {
+        this.errorMessage = 'ارفع صورة بطاقة الطالب أو شهادة الميلاد';
+      }
       this.markAllFieldsAsTouched();
     }
   }
@@ -271,6 +318,7 @@ export class SignUpComponent implements OnInit {
     const field = this.registrationForm.get(fieldName);
     if (field?.errors) {
       if (field.errors['required']) return 'هذا الحقل مطلوب';
+      if (field.errors['quadName']) return 'الاسم يجب أن يكون رباعياً';
       if (field.errors['email']) return 'البريد الإلكتروني غير صحيح';
       if (field.errors['minlength']) return 'الحد الأدنى للأحرف غير مستوفى';
       if (field.errors['pattern']) {

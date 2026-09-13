@@ -83,6 +83,17 @@ export class TeacherAuthoringService {
     );
   }
 
+  addMaterial(sessionId: number, file: File, title: string) {
+    const form = new FormData();
+    form.append('file', file);
+    form.append('title', title);
+    return this.http.post<ApiResponse<unknown>>(apiUrl(`session/${sessionId}/materials`), form);
+  }
+
+  deleteMaterial(id: number) {
+    return this.http.delete<ApiResponse<unknown>>(apiUrl(`session/materials/${id}`));
+  }
+
   private resource(type: ContentType): string {
     return type === 'video' ? 'videos' : type === 'homework' ? 'homeworks' : 'tests';
   }

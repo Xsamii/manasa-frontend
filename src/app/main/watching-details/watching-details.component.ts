@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
+import { PageIntroComponent } from '../../shared/components/page-intro/page-intro.component';
 import { TableColumn, TableComponent } from '../../shared/components/table/table.component';
 import { StatisticsService, WatchingDetail } from '../../shared/services/statistics.service';
 
@@ -12,7 +13,8 @@ import { StatisticsService, WatchingDetail } from '../../shared/services/statist
     CommonModule,
     RouterModule,
     TableComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    PageIntroComponent
   ],
   templateUrl: './watching-details.component.html',
   styleUrl: './watching-details.component.scss'

@@ -29,8 +29,20 @@ export const teacherRoutes: Routes = [{
       loadComponent: () => import('./teacher-operations.component').then(c => c.TeacherOperationsComponent),
     },
     {
+      path: 'students',
+      loadComponent: () => import('./teacher-students.component').then(c => c.TeacherStudentsComponent),
+    },
+    {
+      path: 'report',
+      loadComponent: () => import('./teacher-combined-report.component').then(c => c.TeacherCombinedReportComponent),
+    },
+    {
       path: 'analytics',
       loadComponent: () => import('./teacher-community-analytics.component').then(c => c.TeacherCommunityAnalyticsComponent),
+    },
+    {
+      path: 'account',
+      loadComponent: () => import('../main/account/account-settings.component').then(c => c.AccountSettingsComponent),
     },
     {
       path: 'forum',

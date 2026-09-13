@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { MyCoursesComponent } from './my-courses.component';
 import { CourseService } from '../../../shared/services/course.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 describe('MyCoursesComponent', () => {
   let component: MyCoursesComponent;
@@ -16,7 +17,6 @@ describe('MyCoursesComponent', () => {
       success: true,
       data: [],
     })),
-    enrollInCourse: jasmine.createSpy(),
   };
 
   beforeEach(async () => {
@@ -25,6 +25,7 @@ describe('MyCoursesComponent', () => {
       providers: [
         provideRouter([]),
         { provide: CourseService, useValue: courseService },
+        { provide: AuthService, useValue: { isAuthenticated: true, currentUser: { fullName: 'Test', gender: 'male' } } },
       ],
     })
     .compileComponents();

@@ -1,17 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumb/breadcrumb.component';
+import { PageIntroComponent } from '../../../shared/components/page-intro/page-intro.component';
 import { Course } from '../../../shared/models/course.model';
 import { CourseService } from '../../../shared/services/course.service';
+import { AuthService } from '../../../shared/services/auth.service';
+import { StudyYearPipe } from '../../../shared/pipes/study-year.pipe';
+import { mediaUrl } from '../../../shared/utils/media-url';
 
 type CourseFilter = 'all' | 'my-courses';
 
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, RouterModule, BreadcrumbComponent],
+  imports: [CommonModule, RouterModule, BreadcrumbComponent, StudyYearPipe, PageIntroComponent],
   templateUrl: './my-courses.component.html',
   styleUrl: './my-courses.component.scss'
 })
@@ -31,13 +35,30 @@ export class MyCoursesComponent implements OnInit {
   allCourses: Course[] = [];
   myCourses: Course[] = [];
   filteredCourses: Course[] = [];
-  purchasingCourseId: number | null = null;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private courseService: CourseService,
+    private auth: AuthService,
   ) {}
+
+  get isPublic(): boolean {
+    return this.router.url.startsWith('/learn');
+  }
+
+  get showWelcome(): boolean {
+    return this.route.snapshot.queryParamMap.get('welcome') === '1';
+  }
+
+  get welcomeName(): string {
+    const user = this.auth.currentUser;
+    const first = (user?.fullName || '').trim().split(/\s+/)[0];
+    const prefix = user?.gender === 'female' ? 'الطالبة' : 'الطالب';
+    return first ? `${prefix} ${first}` : prefix;
+  }
+
+  mediaUrl = mediaUrl;
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
@@ -50,9 +71,12 @@ export class MyCoursesComponent implements OnInit {
   loadCourses(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    const enrolled$ = this.auth.isAuthenticated
+      ? this.courseService.getMyCourses()
+      : of({ success: true, data: [] as Course[] });
     forkJoin({
       available: this.courseService.getAvailableCourses(1, 50),
-      enrolled: this.courseService.getMyCourses(),
+      enrolled: enrolled$,
     }).subscribe({
       next: ({ available, enrolled }) => {
         if (!available.success || !enrolled.success) {
@@ -93,35 +117,7 @@ export class MyCoursesComponent implements OnInit {
   }
 
   accessCourse(course: Course): void {
-    if (course.isEnrolled) {
-      void this.router.navigate(['/courses', course.id]);
-      return;
-    }
-    this.enroll(course);
-  }
-
-  enroll(course: Course): void {
-    this.errorMessage = '';
-    this.purchasingCourseId = course.id;
-    this.courseService.enrollInCourse(course.id).subscribe({
-      next: response => {
-        if (!response.success) {
-          this.errorMessage = response.message;
-          this.purchasingCourseId = null;
-          return;
-        }
-        course.isEnrolled = true;
-        if (!this.myCourses.some(item => item.id === course.id)) {
-          this.myCourses = [...this.myCourses, course];
-        }
-        void this.router.navigate(['/courses', course.id]);
-        this.purchasingCourseId = null;
-      },
-      error: error => {
-        this.errorMessage = error.error?.message ?? 'تعذر إتمام التسجيل في الكورس.';
-        this.purchasingCourseId = null;
-      },
-    });
+    void this.router.navigate([this.isPublic ? '/learn' : '/courses', course.id]);
   }
 
   refreshCourses(): void {

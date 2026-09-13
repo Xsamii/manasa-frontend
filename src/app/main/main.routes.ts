@@ -80,6 +80,10 @@ export const mainRoutes: Routes = [
         loadComponent: () => import('./security/security-sessions.component').then(c => c.SecuritySessionsComponent)
       },
       {
+        path: 'account',
+        loadComponent: () => import('./account/account-settings.component').then(c => c.AccountSettingsComponent)
+      },
+      {
         path: 'forum',
         canActivate: [RoleGuard],
         data: { roles: [UserRole.STUDENT] },

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
+import { PageIntroComponent } from '../../shared/components/page-intro/page-intro.component';
 import { WalletService } from '../../shared/services/wallet.service';
 
 interface Purchase {
@@ -29,7 +30,8 @@ interface PurchaseGroup {
   imports: [
     CommonModule,
     RouterModule,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    PageIntroComponent
   ],
   templateUrl: './purchase-history.component.html',
   styleUrl: './purchase-history.component.scss'

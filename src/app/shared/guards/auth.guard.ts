@@ -33,8 +33,11 @@ export class AuthGuard implements CanActivate {
       map(([user]) =>
         user
           ? true
-          : this.router.createUrlTree(['/auth/sign-in'], {
-              queryParams: { returnUrl: state.url },
+          : this.router.createUrlTree(['/'], {
+              queryParams: state.url && state.url !== '/'
+                ? { returnUrl: state.url }
+                : undefined,
+              fragment: 'signin',
             }),
       ),
     );

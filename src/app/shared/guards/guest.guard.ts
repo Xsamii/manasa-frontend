@@ -27,7 +27,7 @@ export class GuestGuard implements CanActivate {
       map(([user]) =>
         user
           ? this.router.createUrlTree([
-              user.role === UserRole.TEACHER ? '/teacher' : '/dashboard',
+              user.role === UserRole.TEACHER ? '/teacher' : '/courses',
             ])
           : true,
       ),

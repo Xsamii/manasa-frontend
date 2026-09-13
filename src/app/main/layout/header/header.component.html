@@ -58,10 +58,17 @@
           <!-- Profile Menu -->
           <div class="relative">
             <button
-              class="p-2 text-gray-600 hover:text-gray-800"
+              class="flex items-center gap-2 rounded-full border border-gray-200 bg-white pr-1 pl-3 py-1 hover:bg-gray-50 transition-colors"
               (click)="profileMenu.toggle($event)"
             >
-              <i class="pi pi-user text-lg"></i>
+              <span class="w-9 h-9 rounded-full bg-orange-500 text-white text-sm font-bold flex items-center justify-center">
+                {{ initials }}
+              </span>
+              <span class="hidden sm:flex flex-col items-end leading-tight">
+                <span class="text-sm font-semibold text-gray-800 max-w-[9rem] truncate">{{ currentUser?.fullName }}</span>
+                <span class="text-[11px] text-gray-500">{{ roleLabel }}</span>
+              </span>
+              <i class="pi pi-angle-down text-xs text-gray-400 hidden sm:block"></i>
             </button>
             
             <!-- Profile Dropdown Menu -->
@@ -70,15 +77,24 @@
       <!-- User Header -->
       <div class="user-header">
         <div class="flex items-center justify-center mb-3">
-          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-            <i class="pi pi-user text-xl text-white"></i>
+          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-white text-lg font-bold">
+            {{ initials }}
           </div>
         </div>
-        <p class="font-medium text-white text-center">أهلاً {{ currentUser?.fullName }}</p>
+        <p class="font-medium text-white text-center">{{ currentUser?.fullName }}</p>
+        <p class="text-xs text-white text-opacity-80 text-center mt-1">{{ currentUser?.email }}</p>
       </div>
       
       <!-- Menu Items -->
       <div class="menu-content">
+        <a
+          [routerLink]="accountLink"
+          class="menu-item"
+          (click)="profileMenu.hide()"
+        >
+          <span class="text-right">إدارة الحساب</span>
+          <i class="pi pi-user-edit menu-icon"></i>
+        </a>
         <!-- Dashboard -->
         <a 
           routerLink="/dashboard" 

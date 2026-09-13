@@ -11,22 +11,30 @@ import {
   TeacherSession,
 } from './teacher-authoring.model';
 import { TeacherAuthoringService } from './teacher-authoring.service';
+import { STUDY_YEAR_OPTIONS } from '../shared/models/study-year';
+import { StudyYearPipe } from '../shared/pipes/study-year.pipe';
+import { PageIntroComponent } from '../shared/components/page-intro/page-intro.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, StudyYearPipe, PageIntroComponent],
   template: `
     <p *ngIf="error" class="bg-red-50 text-red-700 p-3 rounded mb-4">{{ error }}</p>
     <ng-container *ngIf="course">
       <header class="flex flex-wrap items-center gap-3 mb-6">
         <div class="ml-auto"><h1 class="text-3xl font-bold">{{ course.title }}</h1>
-          <p class="text-slate-500">{{ course.status === 'published' ? 'منشور' : 'مسودة' }}</p></div>
+          <p class="text-slate-500">{{ course.studyYear | studyYear }} · {{ course.status === 'published' ? 'منشور' : 'مسودة' }}</p></div>
         <button class="secondary" (click)="preview = !preview">{{ preview ? 'إنهاء المعاينة' : 'معاينة' }}</button>
         <button class="btn" (click)="togglePublish()">{{ course.status === 'published' ? 'إرجاع لمسودة' : 'نشر الكورس' }}</button>
       </header>
+      <app-page-intro
+        text="حرّر بيانات الكورس، أضف جلسات بالترتيب، ثم ارفع فيديو وواجباً واختباراً لكل جلسة. المعاينة تعرض ما سيراه الطالب المشترك. النشر يظهر الكورس في كتالوج الصف.">
+      </app-page-intro>
 
       <section *ngIf="preview" class="card mb-6">
-        <h2 class="text-2xl font-bold">{{ course.title }}</h2><p class="my-2">{{ course.description }}</p>
+        <h2 class="text-2xl font-bold">{{ course.title }}</h2>
+        <p class="text-sm text-slate-500">{{ course.studyYear | studyYear }}</p>
+        <p class="my-2">{{ course.description }}</p>
         <ol class="list-decimal pr-6"><li *ngFor="let lesson of course.sessions">{{ lesson.title }} — {{ contentCount(lesson) }} عناصر</li></ol>
       </section>
 
@@ -35,7 +43,7 @@ import { TeacherAuthoringService } from './teacher-authoring.service';
           <form class="card space-y-3" [formGroup]="metadataForm" (ngSubmit)="saveMetadata()">
             <h2 class="font-bold text-lg">بيانات الكورس</h2>
             <input class="field" formControlName="title"><textarea class="field" formControlName="description"></textarea>
-            <select class="field" formControlName="studyYear"><option *ngFor="let year of years" [value]="year">{{ year }}</option></select>
+            <select class="field" formControlName="studyYear"><option *ngFor="let year of years" [value]="year.value">{{ year.label }}</option></select>
             <input class="field" type="number" min="0" step="0.01" formControlName="price" placeholder="السعر">
             <select class="field" formControlName="currency"><option value="EGP">EGP</option></select>
             <button class="btn w-full" [disabled]="metadataForm.invalid">حفظ</button>
@@ -43,14 +51,17 @@ import { TeacherAuthoringService } from './teacher-authoring.service';
           <section class="card">
             <h2 class="font-bold text-lg mb-3">الطلاب المسجلون ({{ roster.length }})</h2>
             <p *ngIf="!roster.length" class="text-slate-500">لا يوجد طلاب مسجلون حتى الآن.</p>
-            <div *ngFor="let student of roster" class="border-t py-2"><b>{{ student.fullName }}</b><small class="block">{{ student.email }}</small></div>
+            <div *ngFor="let student of roster" class="border-t py-2"><b>{{ student.fullName }}</b><small class="block">{{ student.email }} · {{ student.studyYear | studyYear }}</small></div>
           </section>
         </aside>
 
         <main>
           <form class="card flex flex-col md:flex-row gap-3 mb-4" [formGroup]="sessionForm" (ngSubmit)="addSession()">
-            <input class="field" formControlName="title" placeholder="عنوان الجلسة">
+            <input class="field" formControlName="title" placeholder="عنوان الجلسة / المحاضرة">
             <input class="field" formControlName="description" placeholder="وصف الجلسة">
+            <input class="field" formControlName="outlineLesson" placeholder="درس كذا">
+            <input class="field" formControlName="outlineSolution" placeholder="جزء حل كذا">
+            <input class="field" formControlName="outlinePractice" placeholder="تدريب على كذا">
             <button class="btn" [disabled]="sessionForm.invalid">إضافة جلسة</button>
           </form>
 
@@ -72,6 +83,9 @@ import { TeacherAuthoringService } from './teacher-authoring.service';
               <select class="field" formControlName="type"><option value="video">فيديو</option><option value="homework">واجب</option><option value="test">اختبار</option></select>
               <input class="field" formControlName="title" placeholder="العنوان">
               <input *ngIf="contentForm.controls.type.value === 'video'" class="field md:col-span-2" formControlName="url" placeholder="https://...">
+              <label *ngIf="contentForm.controls.type.value === 'video'" class="md:col-span-2 text-sm flex items-center gap-2">
+                <input type="checkbox" formControlName="isPreview"> فيديو معاينة مجاني 10–20 دقيقة
+              </label>
               <ng-container *ngIf="contentForm.controls.type.value !== 'video'">
                 <input class="field" type="number" min="1" formControlName="maxGrade" placeholder="الدرجة القصوى">
                 <input class="field" type="datetime-local" formControlName="dateOfDelivery">
@@ -82,6 +96,14 @@ import { TeacherAuthoringService } from './teacher-authoring.service';
               </ng-container>
               <button class="btn md:col-span-2">إضافة المحتوى</button>
             </form>
+            <div class="mt-3">
+              <h4 class="font-semibold mb-2">ماتريال المحاضرة (PDF وغيره)</h4>
+              <input type="file" (change)="uploadMaterial(lesson, $event)">
+              <div *ngFor="let material of lesson.materials" class="text-sm flex justify-between border-t py-2">
+                <span>{{ material.title }}</span>
+                <button class="danger" (click)="removeMaterial(material.id)">حذف</button>
+              </div>
+            </div>
           </article>
           <p *ngIf="!course.sessions?.length" class="text-center text-slate-500 py-10">ابدأ بإضافة أول جلسة.</p>
         </main>
@@ -103,7 +125,7 @@ export class TeacherCourseEditorComponent implements OnInit {
   roster: RosterStudent[] = [];
   error = '';
   preview = false;
-  readonly years = ['1st Primary', '2nd Primary', '3rd Primary', '1st Secondary', '2nd Secondary', '3rd Secondary'];
+  readonly years = STUDY_YEAR_OPTIONS;
   metadataForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
     description: ['', Validators.required],
@@ -111,10 +133,17 @@ export class TeacherCourseEditorComponent implements OnInit {
     price: [0, [Validators.required, Validators.min(0)]],
     currency: ['EGP', Validators.required],
   });
-  sessionForm = this.fb.nonNullable.group({ title: ['', Validators.required], description: ['', Validators.required] });
+  sessionForm = this.fb.nonNullable.group({
+    title: ['', Validators.required],
+    description: ['', Validators.required],
+    outlineLesson: [''],
+    outlineSolution: [''],
+    outlinePractice: [''],
+  });
   contentForm = this.fb.nonNullable.group({
     type: ['video' as ContentType, Validators.required], title: ['', Validators.required],
     url: [''], maxGrade: [10], dateOfDelivery: [''], instructions: [''], questionsJson: [''],
+    isPreview: [false],
   });
   private readonly id = Number(this.route.snapshot.paramMap.get('id'));
 
@@ -130,7 +159,21 @@ export class TeacherCourseEditorComponent implements OnInit {
     });
   }
   saveMetadata(): void { if (!this.course || this.metadataForm.invalid) return; this.api.updateCourse(this.id, this.metadataForm.getRawValue()).subscribe({ next: () => this.load(), error: () => this.error = 'تعذر الحفظ' }); }
-  addSession(): void { if (this.sessionForm.invalid) return; this.api.createSession(this.id, { ...this.sessionForm.getRawValue(), position: this.course?.sessions?.length ?? 0 }).subscribe({ next: () => { this.sessionForm.reset(); this.load(); }, error: () => this.error = 'تعذر إضافة الجلسة' }); }
+  addSession(): void {
+    if (this.sessionForm.invalid) return;
+    const value = this.sessionForm.getRawValue();
+    const outline = [
+      value.outlineLesson ? { kind: 'lesson' as const, title: value.outlineLesson } : null,
+      value.outlineSolution ? { kind: 'homework_solution' as const, title: value.outlineSolution } : null,
+      value.outlinePractice ? { kind: 'practice' as const, title: value.outlinePractice } : null,
+    ].filter((item): item is { kind: 'lesson' | 'homework_solution' | 'practice'; title: string } => !!item);
+    this.api.createSession(this.id, {
+      title: value.title,
+      description: value.description,
+      outline,
+      position: this.course?.sessions?.length ?? 0,
+    }).subscribe({ next: () => { this.sessionForm.reset(); this.load(); }, error: () => this.error = 'تعذر إضافة الجلسة' });
+  }
   editSession(lesson: TeacherSession): void {
     const title = prompt('عنوان الجلسة', lesson.title); if (!title) return;
     const description = prompt('وصف الجلسة', lesson.description) ?? lesson.description;
@@ -158,9 +201,17 @@ export class TeacherCourseEditorComponent implements OnInit {
       }
     }
     const input = type === 'video'
-      ? { sessionId: lesson.id, title: value.title, url: value.url, position: this.contentCount(lesson) }
+      ? { sessionId: lesson.id, title: value.title, url: value.url, position: this.contentCount(lesson), isPreview: value.isPreview, previewMaxSeconds: 900 }
       : { sessionId: lesson.id, title: value.title, maxGrade: value.maxGrade, dateOfDelivery: new Date(value.dateOfDelivery).toISOString(), instructions: value.instructions, position: this.contentCount(lesson), ...(type === 'test' ? { questions } : {}) };
-    this.api.createContent(type, input).subscribe({ next: () => { this.contentForm.reset({ type: 'video', maxGrade: 10 }); this.load(); }, error: error => this.error = error.error?.message ?? 'راجع بيانات المحتوى' });
+    this.api.createContent(type, input).subscribe({ next: () => { this.contentForm.reset({ type: 'video', maxGrade: 10, isPreview: false }); this.load(); }, error: error => this.error = error.error?.message ?? 'راجع بيانات المحتوى' });
+  }
+  uploadMaterial(lesson: TeacherSession, event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.api.addMaterial(lesson.id, file, file.name).subscribe({ next: () => this.load(), error: () => this.error = 'تعذر رفع الماتريال' });
+  }
+  removeMaterial(id: number): void {
+    this.api.deleteMaterial(id).subscribe({ next: () => this.load() });
   }
   editContent(type: ContentType, item: TeacherContent): void {
     const title = prompt('العنوان', item.title); if (!title) return;

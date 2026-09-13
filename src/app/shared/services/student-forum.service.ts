@@ -7,6 +7,7 @@ import { apiUrl } from '../../core/config/api.config';
 export interface ForumPost {
   id: number;
   courseId: number;
+  sessionId?: number | null;
   title: string;
   content: string;
   author: {
@@ -68,7 +69,7 @@ export class ForumService {
     });
   }
 
-  createPost(courseId: number, post: Pick<ForumPost, 'title' | 'content'>): Observable<ApiResponse<ForumPost>> {
+  createPost(courseId: number, post: { title: string; content: string; sessionId?: number | null }): Observable<ApiResponse<ForumPost>> {
     return this.http.post<ApiResponse<ForumPost>>(`${this.API_URL}/courses/${courseId}/topics`, post);
   }
 

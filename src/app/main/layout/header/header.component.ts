@@ -17,6 +17,7 @@ import { UserRole } from '../../../shared/models/user.model';
 import { AppNotification, NotificationService } from '../../../shared/services/notification.service';
 import { WalletService } from '../../../shared/services/wallet.service';
 import { Router } from '@angular/router';
+import { userInitials } from '../../../shared/utils/user-initials';
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -62,6 +63,18 @@ export class HeaderComponent implements OnInit {
 
   get isTeacher(): boolean {
     return this.currentUser?.role === UserRole.TEACHER;
+  }
+
+  get initials(): string {
+    return userInitials(this.currentUser?.fullName);
+  }
+
+  get roleLabel(): string {
+    return this.isTeacher ? 'معلم' : 'طالب';
+  }
+
+  get accountLink(): string {
+    return this.isTeacher ? '/teacher/account' : '/account';
   }
 
   ngOnInit() {

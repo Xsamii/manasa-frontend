@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { PageIntroComponent } from '../../shared/components/page-intro/page-intro.component';
 import { TeacherAuthoringService } from '../../teacher/teacher-authoring.service';
 import { UserRole } from '../../shared/models/user.model';
 import { AuthService } from '../../shared/services/auth.service';
@@ -15,7 +16,7 @@ import {
 @Component({
   selector: 'app-student-forum',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PageIntroComponent],
   templateUrl: './student-forum.component.html',
   styleUrl: './student-forum.component.scss'
 })
@@ -28,6 +29,9 @@ export class StudentForumComponent implements OnInit {
   totalRecords = 0;
   title = '';
   content = '';
+  sessionId: number | null = null;
+  lectures: Array<{ id: number; title: string; order?: number }> = [];
+  publishedOk = false;
   reply = '';
   loading = false;
   error = '';
@@ -65,10 +69,35 @@ export class StudentForumComponent implements OnInit {
       ? requested
       : this.courses[0]?.id ?? null;
     if (this.courseId) this.loadTopics();
+    this.loadLectures();
+  }
+
+  loadLectures(): void {
+    if (!this.courseId) { this.lectures = []; return; }
+    if (this.auth.currentUser?.role === UserRole.TEACHER) {
+      this.teacherCourses.getCourse(this.courseId).subscribe({
+        next: response => {
+          this.lectures = (response.data?.sessions ?? []).map((session, index) => ({
+            id: session.id,
+            title: session.title,
+            order: index + 1,
+          }));
+        },
+      });
+      return;
+    }
+    this.courseService.getCourseCurriculum(this.courseId).subscribe({
+      next: response => {
+        if (response.success) {
+          this.lectures = response.data.map(lesson => ({ id: lesson.id, title: lesson.title, order: lesson.order }));
+        }
+      },
+    });
   }
 
   loadTopics(page = 1): void {
     if (!this.courseId) return;
+    this.loadLectures();
     this.loading = true;
     this.selected = null;
     this.forum.getPosts(this.courseId, page).subscribe({
@@ -88,14 +117,18 @@ export class StudentForumComponent implements OnInit {
   }
 
   createTopic(): void {
-    if (!this.courseId || !this.title.trim() || !this.content.trim()) return;
+    if (!this.courseId || !this.content.trim()) return;
+    if (!this.title.trim() && !this.sessionId) return;
     this.forum.createPost(this.courseId, {
       title: this.title,
       content: this.content,
+      sessionId: this.sessionId,
     }).subscribe({
       next: () => {
         this.title = '';
         this.content = '';
+        this.sessionId = null;
+        this.publishedOk = true;
         this.loadTopics(1);
       },
       error: error => this.error = error.error?.message ?? 'تعذر نشر الموضوع.',

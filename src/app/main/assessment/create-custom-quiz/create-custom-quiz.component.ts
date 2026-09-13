@@ -4,11 +4,12 @@ import { RouterLink } from '@angular/router';
 import { forkJoin, of, switchMap } from 'rxjs';
 import { AssessmentSummary, AssessmentService } from '../../../shared/services/assessment.service';
 import { CourseService } from '../../../shared/services/course.service';
+import { PageIntroComponent } from '../../../shared/components/page-intro/page-intro.component';
 
 @Component({
   selector: 'app-create-custom-quiz',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, PageIntroComponent],
   templateUrl: './create-custom-quiz.component.html',
   styleUrl: './create-custom-quiz.component.scss'
 })

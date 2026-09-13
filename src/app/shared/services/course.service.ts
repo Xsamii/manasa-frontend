@@ -11,13 +11,23 @@ import {
 import { ApiResponse, PaginatedData } from '../models/common.model';
 import { apiUrl } from '../../core/config/api.config';
 
+export interface VideoPlaybackUrl {
+  url: string;
+  expiresIn: number | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService {
   private readonly API_URL = apiUrl('courses');
+  private readonly videosUrl = apiUrl('videos');
 
   constructor(private http: HttpClient) {}
+
+  getVideoPlaybackUrl(videoId: number): Observable<ApiResponse<VideoPlaybackUrl>> {
+    return this.http.get<ApiResponse<VideoPlaybackUrl>>(`${this.videosUrl}/${videoId}/playback`);
+  }
 
   getMyCourses(): Observable<ApiResponse<Course[]>> {
     return this.http.get<ApiResponse<Course[]>>(`${this.API_URL}/my-courses`);

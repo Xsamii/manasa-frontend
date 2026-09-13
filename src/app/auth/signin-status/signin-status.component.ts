@@ -21,7 +21,7 @@ constructor(private router: Router) {}
   }
 
   goToDashboard(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/courses'], { queryParams: { welcome: '1' } });
   }
 
   goToCourses(): void {

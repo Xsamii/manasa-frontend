@@ -8,12 +8,70 @@
   </app-breadcrumb>
 
   <div *ngIf="isLoading" class="state-card">جار تحميل مساحة التعلّم...</div>
-  <div *ngIf="errorMessage" class="state-card error" role="alert">
+  <div *ngIf="errorMessage && (!course || course.isEnrolled)" class="state-card error" role="alert">
     <p>{{ errorMessage }}</p>
     <button (click)="loadWorkspace()">إعادة المحاولة</button>
   </div>
 
-  <div *ngIf="!isLoading && course && !errorMessage" class="workspace-grid">
+  <div *ngIf="!isLoading && course && !course.isEnrolled" class="preview-layout">
+    <section class="preview-card">
+      <span class="eyebrow">معاينة الكورس</span>
+      <h1>{{ course.title }}</h1>
+      <app-page-intro
+        kicker="قبل الاشتراك"
+        text="هذه صفحة تعريفية. يمكنك قراءة وصف الكورس واسم المعلم والسعر وعدد الدروس. الفيديو وشرح الدرس والواجبات والاختبارات تبقى مقفلة حتى تشترك أو تشتري.">
+      </app-page-intro>
+      <p class="instructor">{{ course.instructor?.name || 'فريق المنصة' }}</p>
+      <p>{{ course.description }}</p>
+      <p class="price">{{ course.price === 0 ? 'مجاني' : (course.price + ' ' + course.currency) }}</p>
+      <div *ngIf="course.previewVideo as preview" class="preview-player mb-4">
+        <video
+          *ngIf="preview.provider !== 'bunny-stream'"
+          controls
+          [src]="mediaUrl(preview.url)"
+          (timeupdate)="limitPreview($event)">
+        </video>
+        <iframe
+          *ngIf="preview.provider === 'bunny-stream' && previewEmbedUrl"
+          class="bunny-embed"
+          [src]="previewEmbedUrl"
+          allow="autoplay; fullscreen"
+          allowfullscreen>
+        </iframe>
+        <small class="block mt-2 text-teal-800">شرح مجاني من {{ (preview.previewMaxSeconds / 60) | number:'1.0-0' }} دقيقة لأي زائر</small>
+      </div>
+      <p *ngIf="errorMessage" class="preview-error" role="alert">{{ errorMessage }}</p>
+      <button class="complete-button" [disabled]="isEnrolling" (click)="enroll()">
+        {{ enrollCtaLabel() }}
+      </button>
+      <small>لتصفح باقي الكورسات والدورات اشترك</small>
+    </section>
+
+    <aside class="curriculum locked-curriculum">
+      <div class="curriculum-header">
+        <h2>محتوى الكورس</h2>
+        <span>{{ course.lessonsCount }} درس</span>
+      </div>
+      <button *ngFor="let n of lockedLessonIndexes" class="lesson-item locked" type="button" disabled>
+        <span class="lesson-order">🔒</span>
+        <span>
+          <strong>الدرس {{ n }}</strong>
+          <small>مقفل حتى الاشتراك</small>
+        </span>
+      </button>
+      <p *ngIf="lockedLessonIndexes.length === 0" class="empty-lessons">
+        لم تتم إضافة دروس إلى هذا الكورس بعد.
+      </p>
+    </aside>
+  </div>
+
+  <app-page-intro
+    *ngIf="!isLoading && course?.isEnrolled && !errorMessage"
+    kicker="مساحة التعلّم"
+    text="اختر درساً من القائمة. يُحفظ موضع الفيديو تلقائياً. الواجبات والاختبارات تظهر أسفل الدرس بعد أن يضيفها المعلم.">
+  </app-page-intro>
+
+  <div *ngIf="!isLoading && course?.isEnrolled && !errorMessage" class="workspace-grid">
     <aside class="curriculum">
       <div class="curriculum-header">
         <h2>محتوى الكورس</h2>
@@ -42,18 +100,44 @@
     </aside>
 
     <main class="lesson-view" *ngIf="activeLesson; else noLesson">
-      <div class="video-shell" *ngIf="activeLesson.videoUrl; else noVideo">
-        <video
-          #courseVideo
-          controls
-          preload="metadata"
-          [src]="activeLesson.videoUrl"
-          (loadedmetadata)="onVideoLoaded(courseVideo)"
-          (timeupdate)="onTimeUpdate(courseVideo)"
-          (pause)="persistCurrentPosition()"
-          (ended)="completeActiveLesson()">
-          متصفحك لا يدعم تشغيل الفيديو.
-        </video>
+      <div class="player-split" [class.with-material]="!!openMaterial">
+        <div class="video-shell" [style.flex]="videoFlex" *ngIf="activeLesson.videos?.length; else noVideo">
+          <video
+            *ngIf="activeLesson.videos[0].provider !== 'bunny-stream'"
+            #courseVideo
+            controls
+            preload="metadata"
+            [src]="mediaUrl(activeLesson.videoUrl)"
+            (loadedmetadata)="onVideoLoaded(courseVideo)"
+            (timeupdate)="onTimeUpdate(courseVideo)"
+            (pause)="persistCurrentPosition()"
+            (ended)="completeActiveLesson()">
+            متصفحك لا يدعم تشغيل الفيديو.
+          </video>
+          <iframe
+            *ngIf="activeLesson.videos[0].provider === 'bunny-stream' && embedUrl"
+            class="bunny-embed"
+            [src]="embedUrl"
+            allow="autoplay; fullscreen"
+            allowfullscreen>
+          </iframe>
+          <div *ngIf="activeLesson.videos[0].provider === 'bunny-stream' && embedLoading" class="state-card">
+            جاري تحميل الفيديو...
+          </div>
+        </div>
+        <aside *ngIf="openMaterial" class="material-pane" [style.flex]="materialFlex">
+          <div class="flex justify-between items-center mb-2 gap-2">
+            <strong>{{ openMaterial.title }}</strong>
+            <div class="flex gap-2 text-sm">
+              <button type="button" (click)="resizeMaterial(-10)">تصغير</button>
+              <button type="button" (click)="resizeMaterial(10)">تكبير</button>
+              <button type="button" (click)="openMaterial = null">إغلاق</button>
+            </div>
+          </div>
+          <iframe *ngIf="isPdf(openMaterial)" class="material-frame" [src]="safeMaterialUrl(openMaterial.url)"></iframe>
+          <img *ngIf="isImage(openMaterial)" class="material-frame object-contain" [src]="mediaUrl(openMaterial.url)" [alt]="openMaterial.title">
+          <a *ngIf="!isPdf(openMaterial) && !isImage(openMaterial)" [href]="mediaUrl(openMaterial.url)" target="_blank">فتح الملف</a>
+        </aside>
       </div>
       <ng-template #noVideo>
         <div class="no-video">
@@ -66,6 +150,20 @@
         <span class="eyebrow">الدرس {{ activeLesson.order }}</span>
         <h1>{{ activeLesson.title }}</h1>
         <p>{{ activeLesson.description }}</p>
+        <ul *ngIf="activeLesson.outline?.length" class="youtube-outline">
+          <li *ngFor="let item of activeLesson.outline">
+            <strong>{{ outlineLabel(item.kind) }}</strong>
+            <span>{{ item.title }}</span>
+          </li>
+        </ul>
+        <div *ngIf="activeLesson.materials?.length" class="mt-5">
+          <h2 class="font-bold mb-3">الماتريال</h2>
+          <div class="flex flex-wrap gap-3">
+            <button *ngFor="let material of activeLesson.materials" type="button" class="material-chip" (click)="openBeside(material)">
+              {{ material.title }}
+            </button>
+          </div>
+        </div>
         <div class="lesson-actions">
           <button
             class="complete-button"

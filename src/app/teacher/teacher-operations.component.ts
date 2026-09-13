@@ -14,8 +14,9 @@ import { WalletService } from '../shared/services/wallet.service';
       <p *ngIf="issuedCode" class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
         الكود الجديد (يظهر مرة واحدة): <strong class="tracking-widest">{{ issuedCode }}</strong>
       </p>
-      <form class="card grid md:grid-cols-3 gap-3 mb-8" [formGroup]="form" (ngSubmit)="issue()">
+      <form class="card grid md:grid-cols-4 gap-3 mb-8" [formGroup]="form" (ngSubmit)="issue()">
         <input class="field" type="number" min="1" step="0.01" formControlName="amount" placeholder="قيمة الكود">
+        <input class="field" formControlName="comment" placeholder="التعليق (سبب القيمة)">
         <input class="field" type="datetime-local" formControlName="expiresAt">
         <button class="btn" [disabled]="form.invalid">إصدار كود</button>
       </form>
@@ -24,7 +25,7 @@ import { WalletService } from '../shared/services/wallet.service';
           <h2 class="font-bold text-xl mb-4">أكواد الشحن</h2>
           <div *ngFor="let code of codes" class="border-t py-3 text-sm">
             <strong>{{ code.amount }} {{ code.currency }}</strong>
-            <span class="block text-slate-500">{{ code.redeemedAt ? 'مستخدم' : 'متاح' }}</span>
+            <span class="block text-slate-500">{{ code.redeemedAt ? 'مستخدم' : 'متاح' }}{{ code.comment ? ' · ' + code.comment : '' }}</span>
           </div>
           <p *ngIf="!codes.length" class="text-slate-500">لا توجد أكواد بعد.</p>
         </article>
@@ -53,12 +54,13 @@ import { WalletService } from '../shared/services/wallet.service';
 export class TeacherOperationsComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly wallet = inject(WalletService);
-  codes: Array<{ id: string; amount: number; currency: string; redeemedAt: string | null }> = [];
+  codes: Array<{ id: string; amount: number; currency: string; comment?: string | null; redeemedAt: string | null }> = [];
   purchases: Array<{ id: string; title: string; amount: number; currency: string; status: string }> = [];
   issuedCode = '';
   error = '';
   form = this.fb.nonNullable.group({
     amount: [50, [Validators.required, Validators.min(0.01)]],
+    comment: [''],
     expiresAt: [''],
   });
 
@@ -79,7 +81,7 @@ export class TeacherOperationsComponent implements OnInit {
 
   issue(): void {
     const value = this.form.getRawValue();
-    this.wallet.createRechargeCode(value.amount, value.expiresAt || undefined).subscribe({
+    this.wallet.createRechargeCode(value.amount, value.expiresAt || undefined, value.comment || undefined).subscribe({
       next: response => {
         if (response.success) this.issuedCode = response.data.code;
         this.refresh();

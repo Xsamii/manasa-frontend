@@ -89,4 +89,27 @@ describe('AuthService', () => {
       path: '/api/auth/session',
     });
   });
+
+  it('updates the stored user after a profile save', () => {
+    localStorage.setItem('sessionId', 'session-id');
+    service.updateProfile({ fullName: 'سارة علي' }).subscribe();
+    const request = http.expectOne(apiUrl('auth/profile'));
+    expect(request.request.method).toBe('PATCH');
+    request.flush({
+      success: true,
+      data: {
+        user: {
+          id: 5,
+          fullName: 'سارة علي',
+          email: 'sara.student@manasa.test',
+          phoneNumber: '01055556666',
+          role: UserRole.STUDENT,
+        },
+      },
+      message: 'ok',
+      timestamp: new Date().toISOString(),
+      path: '/api/auth/profile',
+    });
+    expect(service.currentUser?.fullName).toBe('سارة علي');
+  });
 });

@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
+import { PageIntroComponent } from '../../shared/components/page-intro/page-intro.component';
 import { WalletService } from '../../shared/services/wallet.service';
 
 @Component({
@@ -18,7 +19,8 @@ import { WalletService } from '../../shared/services/wallet.service';
     InputTextModule,
     ButtonModule,
     MessageModule,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    PageIntroComponent
   ],
   templateUrl: './code-recharge.component.html',
   styleUrl: './code-recharge.component.scss'
@@ -62,17 +64,17 @@ rechargeForm!: FormGroup;
         next: response => {
           this.isLoading = false;
           if (!response.success) {
-            this.errorMessage = response.message;
+            this.errorMessage = 'فشل الرقم غلط ❌';
             this.isCodeInvalid = true;
             return;
           }
-          this.successMessage = `تم الشحن بنجاح. الرصيد الحالي ${response.data.balance} ${response.data.currency}`;
+          this.successMessage = `تم الاشتراك ✅ — الرصيد ${response.data.balance} ${response.data.currency}`;
           this.rechargeForm.reset();
         },
         error: error => {
           this.isLoading = false;
           this.isCodeInvalid = true;
-          this.errorMessage = error.error?.message ?? 'تعذر شحن الكود. حاول مرة أخرى.';
+          this.errorMessage = 'فشل الرقم غلط ❌';
         },
       });
     }

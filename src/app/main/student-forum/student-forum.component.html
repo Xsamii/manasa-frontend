@@ -3,7 +3,10 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
       <div>
         <h1 class="text-3xl font-bold text-slate-900">منتدى الكورس</h1>
-        <p class="text-slate-500">المناقشات متاحة للطلاب المسجلين ومعلم الكورس.</p>
+        <app-page-intro
+          class="block mt-3"
+          text="النقاش مرتبط بكورس واحد. الطلاب المشتركون ومعلم الكورس يمكنهم طرح موضوع أو الرد. اختر الكورس من القائمة ثم اكتب سؤالك.">
+        </app-page-intro>
       </div>
       <select class="border rounded-lg p-3 bg-white" [(ngModel)]="courseId" (change)="loadTopics(1)">
         <option *ngFor="let course of courses" [ngValue]="course.id">{{ course.title }}</option>
@@ -19,9 +22,14 @@
       <div>
         <form class="bg-white border rounded-xl p-5 mb-5" (ngSubmit)="createTopic()">
           <h2 class="font-bold text-lg mb-3">موضوع جديد</h2>
-          <input class="field" name="title" [(ngModel)]="title" maxlength="180" placeholder="عنوان الموضوع">
+          <p *ngIf="publishedOk" class="text-emerald-700 mb-3">تم النشر ✅</p>
+          <select class="field" name="sessionId" [(ngModel)]="sessionId">
+            <option [ngValue]="null">عنوان حر أو اختر رقم المحاضرة</option>
+            <option *ngFor="let lesson of lectures" [ngValue]="lesson.id">المحاضرة {{ lesson.order }} — {{ lesson.title }}</option>
+          </select>
+          <input class="field mt-3" name="title" [(ngModel)]="title" maxlength="180" placeholder="عنوان الموضوع">
           <textarea class="field mt-3 min-h-28" name="content" [(ngModel)]="content" placeholder="اكتب سؤالك أو نقاشك"></textarea>
-          <button class="btn mt-3" [disabled]="!title.trim() || !content.trim()">نشر</button>
+          <button class="btn mt-3" [disabled]="!content.trim() || (!title.trim() && !sessionId)">نشر ✅</button>
         </form>
 
         <div class="space-y-3">

@@ -1,0 +1,100 @@
+<div class="landing" dir="rtl">
+  <header class="landing-nav">
+    <a routerLink="/" class="brand">
+      <img src="assets/icons/logo.svg" alt="منيسرة">
+    </a>
+    <nav>
+      <a href="#offers">ماذا نقدّم</a>
+      <a routerLink="/learn">تعلّم عن كورساتنا</a>
+      <a href="#years">الصفوف</a>
+      <a href="#teach">للمعلمين</a>
+      <a href="#signin">تسجيل الدخول</a>
+    </nav>
+    <a class="nav-cta" routerLink="/auth/sign-up">إنشاء حساب</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">منصة منيسرة للتعلم الإلكتروني</p>
+      <h1>كورسات الإعدادي والثانوي من معلميك، في مكان واحد</h1>
+      <p>
+        شاهد الدروس، اشترِ الكورس من محفظتك، حل الواجبات والاختبارات، وتابع تقدمك.
+        المحتوى الكامل يظهر للطالب بعد الاشتراك أو الشراء.
+      </p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#signin">تسجيل الدخول</a>
+        <a class="btn-ghost" routerLink="/learn">تعلّم عن كورساتنا</a>
+        <a class="btn-ghost" routerLink="/auth/sign-up">حساب طالب جديد</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h2>المنصة للطالب والمعلم</h2>
+      <ul>
+        <li>طلاب: كورسات، فيديوهات، محفظة، منتدى، نتائج.</li>
+        <li>معلمون: نشر كورسات، تصحيح، أكواد شحن، تحليلات.</li>
+        <li>الصفوف: من الأول الإعدادي حتى الثالث الثانوي.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="offers" class="section">
+    <h2>ماذا تستطيع أن تفعل هنا؟</h2>
+    <p class="lead">كل الأدوات التي يحتاجها طالب الإعدادي والثانوي للمتابعة مع معلمه خارج الحصة.</p>
+    <div class="cards">
+      <article *ngFor="let offer of offers">
+        <h3>{{ offer.title }}</h3>
+        <p>{{ offer.text }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="years" class="band">
+    <div class="inner">
+      <h2>الصفوف الدراسية</h2>
+      <p class="lead">اختر صفك عند إنشاء الحساب. يظهر لك كتالوج الكورسات المناسب، ويستطيع المعلم تحديد الصف عند نشر كل كورس.</p>
+      <div class="years">
+        <span *ngFor="let year of years">{{ year.label }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="teach" class="section">
+    <h2>للمعلمين</h2>
+    <p class="lead">حساب المعلم يفتح مساحة التأليف: الكورس يبقى مسودة إلى أن تضيف جلسة وتنشره، بعدها يراه طلاب الصف.</p>
+    <ul class="checklist">
+      <li *ngFor="let item of teacherOffers">{{ item }}</li>
+    </ul>
+  </section>
+
+  <section class="band">
+    <div class="inner">
+      <h2>كيف تبدأ؟</h2>
+      <div class="steps">
+        <article *ngFor="let step of steps">
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.text }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="signin" class="signin-section">
+    <div class="signin-wrap">
+      <div class="signin-copy">
+        <h2>سجّل دخولك للبدء</h2>
+        <p>
+          بعد تسجيل الدخول تنتقل إلى صفحتك الرئيسية: كورساتك، معلومك، اشتراكاتك، وإحصائياتك.
+          الزائر يرى هذه الصفحة التعريفية فقط، بدون محتوى الدروس.
+        </p>
+      </div>
+      <div class="signin-panel">
+        <app-sign-in-form [embedded]="true"></app-sign-in-form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <p>منيسرة · منصة كورسات الإعدادي والثانوي</p>
+    <a routerLink="/auth/sign-in">صفحة تسجيل الدخول الكاملة</a>
+  </footer>
+</div>

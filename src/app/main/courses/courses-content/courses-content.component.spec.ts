@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { CoursesContentComponent } from './courses-content.component';
 import { CourseService } from '../../../shared/services/course.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 describe('CoursesContentComponent', () => {
   let component: CoursesContentComponent;
@@ -10,7 +11,7 @@ describe('CoursesContentComponent', () => {
   const courseService = {
     getCourse: jasmine.createSpy().and.returnValue(of({
       success: true,
-      data: { id: 3, title: 'Course' },
+      data: { id: 3, title: 'Course', isEnrolled: true, lessonsCount: 1 },
     })),
     getCourseCurriculum: jasmine.createSpy().and.returnValue(of({
       success: true,
@@ -48,13 +49,16 @@ describe('CoursesContentComponent', () => {
       },
     })),
     markLessonCompleted: jasmine.createSpy(),
+    enrollInCourse: jasmine.createSpy(),
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CoursesContentComponent],
       providers: [
+        provideRouter([]),
         { provide: CourseService, useValue: courseService },
+        { provide: AuthService, useValue: { isAuthenticated: true, currentUser: null } },
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: { get: () => '3' } } },
@@ -75,5 +79,53 @@ describe('CoursesContentComponent', () => {
   it('resumes the last watched lesson', () => {
     expect(component.activeLesson?.id).toBe(8);
     expect(component.activeLesson?.lastPositionSeconds).toBeGreaterThan(0);
+  });
+});
+
+describe('CoursesContentComponent locked preview', () => {
+  let component: CoursesContentComponent;
+  const courseService = {
+    getCourse: jasmine.createSpy().and.returnValue(of({
+      success: true,
+      data: {
+        id: 3,
+        title: 'Course',
+        description: 'Public summary',
+        isEnrolled: false,
+        lessonsCount: 2,
+        price: 50,
+        currency: 'EGP',
+      },
+    })),
+    getCourseCurriculum: jasmine.createSpy(),
+    getCourseProgress: jasmine.createSpy(),
+    enrollInCourse: jasmine.createSpy(),
+  };
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [CoursesContentComponent],
+      providers: [
+        provideRouter([]),
+        { provide: CourseService, useValue: courseService },
+        { provide: AuthService, useValue: { isAuthenticated: true, currentUser: null } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => '3' } } },
+        },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(CoursesContentComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('does not load videos or curriculum before enrollment', () => {
+    expect(component.course?.isEnrolled).toBeFalse();
+    expect(component.lessons.length).toBe(0);
+    expect(component.activeLesson).toBeNull();
+    expect(courseService.getCourseCurriculum).not.toHaveBeenCalled();
+    expect(courseService.getCourseProgress).not.toHaveBeenCalled();
   });
 });

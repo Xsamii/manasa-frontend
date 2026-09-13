@@ -1,25 +1,26 @@
 :host {
-      display: block;
-    }
+  display: block;
+}
 
-    /* Mobile responsive */
-    @media (max-width: 1024px) {
-      .grid-cols-4 {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
+.shortcut {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-radius: 1rem;
+  padding: 1.2rem 1.4rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+}
 
-    @media (max-width: 768px) {
-      .flex {
-        flex-direction: column;
-        gap: 2rem;
-      }
-      
-      .text-4xl {
-        font-size: 2rem;
-      }
-      
-      .text-3xl {
-        font-size: 1.75rem;
-      }
-    }
+.shortcut span {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.shortcut small {
+  color: #64748b;
+}
+
+.shortcut-forum { background: #fff0f0; }
+.shortcut-courses { background: #fff2e5; }
+.shortcut-subs { background: #e1f7e3; }
+.shortcut-stats { background: #ebebff; }

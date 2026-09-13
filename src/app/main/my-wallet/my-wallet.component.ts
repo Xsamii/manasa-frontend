@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
+import { PageIntroComponent } from '../../shared/components/page-intro/page-intro.component';
 import { TableColumn, TableComponent } from '../../shared/components/table/table.component';
 import { WalletService } from '../../shared/services/wallet.service';
 
@@ -26,7 +27,8 @@ interface WalletTransaction {
     InputTextModule,
     ButtonModule,
     TableComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    PageIntroComponent
   ],
   templateUrl: './my-wallet.component.html',
   styleUrl: './my-wallet.component.scss'

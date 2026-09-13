@@ -4,10 +4,17 @@
 
     <div class="mx-auto bg-white rounded-lg shadow-sm p-8">
       <div class="border-b border-gray-200 mb-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">تعلّم من كورساتنا</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">تعلّم عن كورساتنا</h1>
+        <p *ngIf="showWelcome" class="bg-emerald-50 text-emerald-800 rounded-lg p-4 mb-4">
+          مرحبا بك يا {{ welcomeName }} يمكنك الوصول إلى جميع الكورسات الآن
+        </p>
+        <app-page-intro
+          text="لكل معلم معاينة مجانية من 10 إلى 20 دقيقة. شاهد الدرس المجاني لأي زائر، ولمتابعة باقي الكورسات والدورات اشترك."
+          [points]="['الفيديو القصير متاح قبل التسجيل وبعده.', 'بعد الاشتراك ينفتح المنهج الكامل والواجبات والاختبارات.']">
+        </app-page-intro>
       </div>
 
-      <div class="filter-section mb-8">
+      <div class="filter-section mb-8" *ngIf="!isPublic">
         <h2 class="filter-title">اختر الكورسات التي تريد عرضها</h2>
         <div class="filter-tabs">
           <button *ngFor="let filter of filterOptions"
@@ -28,9 +35,10 @@
       <div class="courses-grid" *ngIf="!isLoading && !errorMessage">
         <article *ngFor="let course of filteredCourses" class="course-card">
           <div class="course-image bg-gradient-to-br from-teal-700 to-teal-900 flex items-center justify-center">
-            <i class="pi pi-book text-white text-6xl"></i>
+            <video *ngIf="course.previewVideo as preview" class="w-full h-full object-cover" [src]="mediaUrl(preview.url)" muted playsinline></video>
+            <i *ngIf="!course.previewVideo?.url" class="pi pi-book text-white text-6xl"></i>
             <div class="course-overlay">
-              <span class="course-badge badge-math">{{ course.studyYear }}</span>
+              <span class="course-badge badge-math">{{ course.studyYear | studyYear }}</span>
             </div>
           </div>
           <div class="course-content">
@@ -44,15 +52,11 @@
             <p *ngIf="!course.isEnrolled" class="font-semibold text-orange-600 mb-3">
               {{ course.price === 0 ? 'مجاني' : (course.price + ' ' + course.currency) }}
             </p>
-            <div *ngIf="course.isEnrolled" class="mb-3">
-              <div class="h-2 rounded bg-gray-200 overflow-hidden">
-                <div class="h-full bg-orange-500" [style.width.%]="course.progressPercentage || 0"></div>
-              </div>
-              <small>{{ course.progressPercentage || 0 }}% مكتمل</small>
-            </div>
-            <button class="course-access-btn" (click)="accessCourse(course)"
-                    [disabled]="purchasingCourseId === course.id">
-              {{ purchasingCourseId === course.id ? 'جارٍ إتمام العملية...' : (course.isEnrolled ? 'متابعة التعلّم' : (course.price === 0 ? 'التسجيل مجاناً' : 'شراء والتسجيل')) }}
+            <p *ngIf="course.previewVideo as preview" class="text-xs text-teal-700 mb-3">
+              درس مجاني {{ (preview.previewMaxSeconds / 60) | number:'1.0-0' }} دقيقة
+            </p>
+            <button class="course-access-btn" (click)="accessCourse(course)">
+              {{ course.isEnrolled ? 'متابعة التعلّم' : 'شاهد المعاينة ثم اشترك' }}
             </button>
           </div>
         </article>

@@ -23,6 +23,13 @@ import { AuthService, DeviceSession } from '../../shared/services/auth.service';
         </div>
       </article>
       <p *ngIf="!loading && !sessions.length" class="mt-6 text-slate-500">لا توجد جلسات نشطة.</p>
+      <button
+        *ngIf="sessions.length > 1"
+        class="mt-6 bg-slate-900 text-white rounded-xl px-4 py-3"
+        (click)="logoutOthers()"
+      >
+        إنهاء الجلسات الأخرى
+      </button>
     </main>
   `,
 })
@@ -55,6 +62,13 @@ export class SecuritySessionsComponent implements OnInit {
     this.auth.revokeSession(session.id).subscribe({
       next: () => this.load(),
       error: () => this.error = 'تعذر إنهاء الجلسة.',
+    });
+  }
+
+  logoutOthers(): void {
+    this.auth.logoutOthers().subscribe({
+      next: () => this.load(),
+      error: () => this.error = 'تعذر إنهاء الجلسات الأخرى.',
     });
   }
 }

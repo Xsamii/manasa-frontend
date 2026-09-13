@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
+import { PageIntroComponent } from '../../shared/components/page-intro/page-intro.component';
 import { TableColumn, TableComponent } from '../../shared/components/table/table.component';
 import { WalletService } from '../../shared/services/wallet.service';
 
@@ -20,7 +21,8 @@ interface Subscription {
     CommonModule,
     RouterModule,
     TableComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    PageIntroComponent
   ],
   templateUrl: './subscriptions.component.html',
   styleUrl: './subscriptions.component.scss'

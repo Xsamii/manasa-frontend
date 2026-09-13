@@ -1,0 +1,140 @@
+<div>
+  <div class="mb-4 lg:mb-6">
+    <h2 class="text-lg lg:text-xl font-semibold text-gray-800 mb-2">
+      {{ isTeacher ? 'تسجيل دخول المعلم' : 'تسجيل دخول الطالب' }}
+    </h2>
+    <p class="text-xs lg:text-sm text-gray-600">
+      {{ isTeacher
+        ? 'ادخل إلى مساحة نشر الكورسات والجلسات والتصحيح ومتابعة طلابك.'
+        : 'ادخل لعرض كورسات صفك، الاشتراك، مشاهدة الدروس، وحل الواجبات والاختبارات.' }}
+    </p>
+  </div>
+
+  <div class="flex rounded-lg border border-gray-200 overflow-hidden mb-5 text-sm">
+    <ng-container *ngIf="embedded; else routedTabs">
+      <button
+        type="button"
+        class="flex-1 text-center py-2"
+        [class.bg-orange-500]="!isTeacher"
+        [class.text-white]="!isTeacher"
+        [class.bg-white]="isTeacher"
+        [class.text-gray-700]="isTeacher"
+        (click)="setRole(studentRole)"
+      >طالب</button>
+      <button
+        type="button"
+        class="flex-1 text-center py-2 border-r border-gray-200"
+        [class.bg-orange-500]="isTeacher"
+        [class.text-white]="isTeacher"
+        [class.bg-white]="!isTeacher"
+        [class.text-gray-700]="!isTeacher"
+        (click)="setRole(teacherRole)"
+      >معلم</button>
+    </ng-container>
+    <ng-template #routedTabs>
+      <a
+        routerLink="/auth/sign-in"
+        class="flex-1 text-center py-2"
+        [class.bg-orange-500]="!isTeacher"
+        [class.text-white]="!isTeacher"
+        [class.bg-white]="isTeacher"
+        [class.text-gray-700]="isTeacher"
+      >طالب</a>
+      <a
+        routerLink="/auth/teacher-sign-in"
+        class="flex-1 text-center py-2 border-r border-gray-200"
+        [class.bg-orange-500]="isTeacher"
+        [class.text-white]="isTeacher"
+        [class.bg-white]="!isTeacher"
+        [class.text-gray-700]="!isTeacher"
+      >معلم</a>
+    </ng-template>
+  </div>
+
+  <p-message
+    *ngIf="errorMessage"
+    severity="error"
+    [text]="errorMessage"
+    styleClass="mb-4"
+  ></p-message>
+
+  <button
+    *ngIf="showDemoHint"
+    type="button"
+    class="w-full mb-4 text-right bg-orange-50 border border-orange-200 rounded-lg p-3"
+    (click)="fillDemoAccount()"
+  >
+    <strong class="block text-orange-800 text-sm">حساب تجريبي: {{ demoAccount.name }}</strong>
+    <span class="block text-xs text-gray-600 mt-1">{{ demoAccount.email }}</span>
+    <span class="block text-xs text-gray-500">كلمة المرور: {{ demoPassword }}</span>
+  </button>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+    <div class="form-field">
+      <label for="email" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+        البريد الإلكتروني
+      </label>
+      <input
+        pInputText
+        id="email"
+        formControlName="email"
+        placeholder="أدخل بريدك الإلكتروني"
+        class="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+        [class.ng-invalid]="isFieldInvalid('email')"
+      />
+      <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('email')">
+        {{ getFieldError('email') }}
+      </small>
+    </div>
+
+    <div class="form-field">
+      <label for="password" class="block text-sm font-medium text-gray-700 mb-2 text-right">
+        كلمة المرور
+      </label>
+      <p-password
+        formControlName="password"
+        placeholder="أدخل كلمة المرور"
+        styleClass="w-full"
+        inputStyleClass="w-full text-right border border-gray-300 rounded-md p-2 text-sm lg:text-base"
+        [class.ng-invalid]="isFieldInvalid('password')"
+        [feedback]="false"
+        [toggleMask]="true"
+      ></p-password>
+      <small class="text-red-500 text-right block text-xs" *ngIf="isFieldInvalid('password')">
+        {{ getFieldError('password') }}
+      </small>
+    </div>
+
+    <div class="flex items-center">
+      <p-checkbox
+        formControlName="rememberMe"
+        binary="true"
+        inputId="rememberMe"
+      ></p-checkbox>
+      <label for="rememberMe" class="mr-2 text-sm text-gray-600">تذكرني</label>
+    </div>
+
+    <div class="pt-4">
+      <button
+        pButton
+        type="submit"
+        [label]="isTeacher ? 'دخول كمعلم' : 'دخول كطالب'"
+        class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 lg:py-3 px-4 rounded-lg font-medium transition-colors text-sm lg:text-base"
+        [disabled]="loginForm.invalid || isLoading"
+        [loading]="isLoading"
+      ></button>
+    </div>
+
+    <div class="text-center pt-4" *ngIf="!isTeacher">
+      <p class="text-sm text-gray-600">
+        ليس لديك حساب؟
+        <a routerLink="/auth/sign-up" class="text-orange-600 hover:text-orange-500 font-medium">
+          إنشاء حساب طالب
+        </a>
+      </p>
+    </div>
+    <div class="text-center pt-4" *ngIf="isTeacher">
+      <p class="text-sm text-gray-500">حسابات المعلمين تُنشأ من إدارة المنصة.</p>
+    </div>
+  </form>
+</div>

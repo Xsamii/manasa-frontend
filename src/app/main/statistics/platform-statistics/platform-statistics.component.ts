@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '../../../shared/components/breadcrumb/breadcrumb.component';
+import { PageIntroComponent } from '../../../shared/components/page-intro/page-intro.component';
 import { PlatformStatistics, StatisticsService } from '../../../shared/services/statistics.service';
 
 @Component({
@@ -10,7 +11,8 @@ import { PlatformStatistics, StatisticsService } from '../../../shared/services/
   imports: [
     CommonModule,
     RouterModule,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    PageIntroComponent
   ],
   templateUrl: './platform-statistics.component.html',
   styleUrl: './platform-statistics.component.scss'

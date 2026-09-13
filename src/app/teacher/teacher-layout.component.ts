@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { AppNotification, NotificationService } from '../shared/services/notification.service';
+import { AuthService } from '../shared/services/auth.service';
+import { userInitials } from '../shared/utils/user-initials';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, OverlayPanelModule],
   template: `
     <div class="min-h-screen bg-slate-50" dir="rtl">
       <nav class="bg-slate-900 text-white px-6 py-4 flex flex-wrap gap-4 items-center">
@@ -14,12 +17,27 @@ import { AppNotification, NotificationService } from '../shared/services/notific
         <a routerLink="/teacher/grading" routerLinkActive="text-orange-400">التصحيح</a>
         <a routerLink="/teacher/forum" routerLinkActive="text-orange-400">منتدى الكورسات</a>
         <a routerLink="/teacher/operations" routerLinkActive="text-orange-400">الأكواد والاسترداد</a>
-        <a routerLink="/teacher/analytics" routerLinkActive="text-orange-400">التحليلات والإشراف</a>
+        <a routerLink="/teacher/students" routerLinkActive="text-orange-400">طلبات التسجيل</a>
+        <a routerLink="/teacher/report" routerLinkActive="text-orange-400">شيت المشاهدات</a>
         <button class="relative" (click)="showNotifications = !showNotifications">
           إشعارات
           <span *ngIf="unread" class="bg-red-600 rounded-full px-2 text-xs">{{ unread }}</span>
         </button>
-        <a routerLink="/dashboard">واجهة المنصة</a>
+        <button class="mr-auto flex items-center gap-2 rounded-full bg-slate-800 pr-1 pl-3 py-1" (click)="accountMenu.toggle($event)">
+          <span class="w-9 h-9 rounded-full bg-orange-500 text-white font-bold flex items-center justify-center">{{ initials }}</span>
+          <span class="hidden sm:flex flex-col items-end leading-tight">
+            <span class="text-sm font-semibold max-w-[9rem] truncate">{{ auth.currentUser?.fullName }}</span>
+            <span class="text-[11px] text-slate-300">معلم</span>
+          </span>
+        </button>
+        <p-overlayPanel #accountMenu>
+          <div class="w-56" dir="rtl">
+            <p class="font-semibold p-3 border-b">{{ auth.currentUser?.fullName }}</p>
+            <a routerLink="/teacher/account" class="block p-3 hover:bg-slate-50" (click)="accountMenu.hide()">إدارة الحساب</a>
+            <a routerLink="/security" class="block p-3 hover:bg-slate-50" (click)="accountMenu.hide()">الأمان والجلسات</a>
+            <button class="block w-full text-right p-3 text-red-700 hover:bg-red-50" (click)="logout()">تسجيل خروج</button>
+          </div>
+        </p-overlayPanel>
       </nav>
       <aside *ngIf="showNotifications" class="fixed left-4 top-16 z-50 w-80 max-w-[90vw] bg-white shadow-xl rounded-xl p-4" dir="rtl">
         <div class="flex justify-between border-b pb-2 mb-2">
@@ -41,7 +59,18 @@ export class TeacherLayoutComponent implements OnInit {
   showNotifications = false;
   notifications: AppNotification[] = [];
 
-  constructor(private readonly service: NotificationService) {}
+  constructor(
+    private readonly service: NotificationService,
+    readonly auth: AuthService,
+  ) {}
+
+  get initials(): string {
+    return userInitials(this.auth.currentUser?.fullName);
+  }
+
+  logout(): void {
+    this.auth.logout().subscribe({ error: () => undefined });
+  }
 
   ngOnInit(): void {
     this.service.unreadCount().subscribe({

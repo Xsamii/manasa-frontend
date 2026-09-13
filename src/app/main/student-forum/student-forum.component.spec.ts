@@ -5,6 +5,8 @@ import { of } from 'rxjs';
 
 import { StudentForumComponent } from './student-forum.component';
 import { CourseService } from '../../shared/services/course.service';
+import { AuthService } from '../../shared/services/auth.service';
+import { UserRole } from '../../shared/models/user.model';
 
 describe('StudentForumComponent', () => {
   let component: StudentForumComponent;
@@ -18,6 +20,10 @@ describe('StudentForumComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { queryParamMap: { get: () => null } } },
+        },
+        {
+          provide: AuthService,
+          useValue: { currentUser: { role: UserRole.STUDENT } },
         },
         {
           provide: CourseService,

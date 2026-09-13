@@ -4,6 +4,22 @@ export interface User {
   email: string;
   phoneNumber: string;
   role: UserRole;
+  schoolName?: string | null;
+  studyYear?: string | null;
+  governorate?: string | null;
+  address?: string | null;
+  specialization?: string | null;
+  gender?: string | null;
+  jobTitle?: string | null;
+  fatherPhoneNumber?: string | null;
+  fatherCountryCode?: string | null;
+  motherPhoneNumber?: string | null;
+  motherCountryCode?: string | null;
+  parentUnavailable?: 'none' | 'father' | 'mother';
+  accountStatus?: 'pending' | 'approved' | 'rejected';
+  profileAccessEnabled?: boolean;
+  centerId?: number | null;
+  centerName?: string | null;
 }
 
 export enum UserRole {
@@ -20,6 +36,7 @@ export interface UserRegistration {
   fatherPhoneNumber: string;
   motherCountryCode: string;
   motherPhoneNumber: string;
+  parentUnavailable: 'none' | 'father' | 'mother';
   schoolName: string;
   jobTitle: string;
   governorate: string;

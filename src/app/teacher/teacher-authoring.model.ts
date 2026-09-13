@@ -11,6 +11,8 @@ export interface TeacherContent {
   maxGrade?: number;
   dateOfDelivery?: string;
   instructions?: string | null;
+  isPreview?: boolean;
+  previewMaxSeconds?: number;
   questions?: Array<{
     id?: number;
     prompt: string;
@@ -28,6 +30,14 @@ export interface TeacherSession {
   videos: TeacherContent[];
   homeworks: TeacherContent[];
   tests: TeacherContent[];
+  outline?: Array<{ kind: 'lesson' | 'homework_solution' | 'practice'; title: string }>;
+  materials?: Array<{
+    id: number;
+    title: string;
+    url: string;
+    originalName: string;
+    mimeType: string;
+  }>;
 }
 
 export interface TeacherCourse {

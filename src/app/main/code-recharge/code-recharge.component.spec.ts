@@ -36,6 +36,7 @@ describe('CodeRechargeComponent', () => {
   it('submits a recharge code and shows the server balance', () => {
     component.rechargeForm.setValue({ rechargeCode: 'ABC-123' });
     component.onSubmit();
+    expect(component.successMessage).toContain('تم الاشتراك ✅');
     expect(component.successMessage).toContain('50 EGP');
   });
 });

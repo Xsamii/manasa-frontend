@@ -102,15 +102,15 @@ export class WalletService {
     return this.http.get<ApiResponse<unknown>>(`${this.API_URL}/purchases/${purchaseId}/receipt`);
   }
 
-  createRechargeCode(amount: number, expiresAt?: string): Observable<ApiResponse<{ code: string; amount: number; currency: string }>> {
-    return this.http.post<ApiResponse<{ code: string; amount: number; currency: string }>>(
+  createRechargeCode(amount: number, expiresAt?: string, comment?: string): Observable<ApiResponse<{ code: string; amount: number; currency: string; comment?: string | null }>> {
+    return this.http.post<ApiResponse<{ code: string; amount: number; currency: string; comment?: string | null }>>(
       `${this.API_URL}/management/recharge-codes`,
-      { amount, expiresAt },
+      { amount, expiresAt, comment },
     );
   }
 
-  listIssuedCodes(): Observable<ApiResponse<Array<{ id: string; amount: number; currency: string; redeemedAt: string | null }>>> {
-    return this.http.get<ApiResponse<Array<{ id: string; amount: number; currency: string; redeemedAt: string | null }>>>(
+  listIssuedCodes(): Observable<ApiResponse<Array<{ id: string; amount: number; currency: string; comment?: string | null; redeemedAt: string | null }>>> {
+    return this.http.get<ApiResponse<Array<{ id: string; amount: number; currency: string; comment?: string | null; redeemedAt: string | null }>>>(
       `${this.API_URL}/management/recharge-codes`,
     );
   }
