@@ -10,6 +10,11 @@ export const mainRoutes: Routes = [
     loadChildren: () => import('../teacher/teacher.routes').then(m => m.teacherRoutes),
   },
   {
+    path: 'admin',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('../admin/admin.routes').then(m => m.adminRoutes),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/main-layout/main-layout.component').then(c => c.MainLayoutComponent),
     canActivate: [AuthGuard],

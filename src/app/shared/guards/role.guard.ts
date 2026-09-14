@@ -20,8 +20,9 @@ export class RoleGuard implements CanActivate {
     if (!roles.length || this.auth.isRoleAllowed(roles)) {
       return true;
     }
+    const role = this.auth.currentUser?.role;
     return this.router.createUrlTree([
-      this.auth.currentUser?.role === UserRole.TEACHER ? '/teacher' : '/dashboard',
+      role === UserRole.ADMIN ? '/admin' : role === UserRole.TEACHER ? '/teacher' : '/dashboard',
     ]);
   }
 }

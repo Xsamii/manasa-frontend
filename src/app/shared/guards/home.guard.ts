@@ -27,7 +27,11 @@ export class HomeGuard implements CanActivate {
       map(([user]) =>
         user
           ? this.router.createUrlTree([
-              user.role === UserRole.TEACHER ? '/teacher' : '/courses',
+              user.role === UserRole.ADMIN
+                ? '/admin'
+                : user.role === UserRole.TEACHER
+                  ? '/teacher'
+                  : '/courses',
             ])
           : true,
       ),

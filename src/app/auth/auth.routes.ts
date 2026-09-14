@@ -24,6 +24,11 @@ export const authRoutes: Routes = [
     loadComponent: () => import('./sign-in/sign-in.component').then(c => c.SignInComponent)
   },
   {
+    path: 'admin-sign-in',
+    canActivate: [GuestGuard],
+    loadComponent: () => import('./admin-sign-in/admin-sign-in.component').then(c => c.AdminSignInComponent)
+  },
+  {
     path: 'login',
     redirectTo: 'sign-in',
     pathMatch: 'full'
